@@ -25,7 +25,7 @@ export function createCorkboardPage(experience) {
   modal.className = 'note-modal';
   modal.innerHTML = `
     <div class="note-modal-card">
-      <button class="note-modal-close">×</button>
+      <button class="note-modal-close" aria-label="Close note">×</button>
       <h2></h2><p></p>
     </div>`;
   el.appendChild(modal);
@@ -49,9 +49,12 @@ export function createCorkboardPage(experience) {
     noteEl.style.left = `${pos.left}%`;
     noteEl.style.top = `${pos.top}%`;
     noteEl.style.setProperty('--note-rot', `${pos.rot}deg`);
+    noteEl.dataset.route = String(i + 1).padStart(2, '0');
+    const route = noteEl.dataset.route;
     noteEl.innerHTML = `
       <span class="note-pin"></span>
       ${note.type === 'polaroid' ? '<span class="polaroid-photo"></span>' : ''}
+      <span class="note-route">ROUTE ${route}</span>
       <span class="note-title">${note.title}</span>`;
     noteEl.addEventListener('click', () => {
       modal.querySelector('h2').textContent = note.title;
