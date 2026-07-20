@@ -11,23 +11,24 @@ function paintWall(ctx, mode) {
 
   const base = ctx.createLinearGradient(0, 0, 0, WALL_H);
   if (day) {
-    base.addColorStop(0, '#4f4a36');
-    base.addColorStop(0.55, '#5d5440');
-    base.addColorStop(1, '#6d5f46');
+    base.addColorStop(0, '#3B3B35');
+    base.addColorStop(0.55, '#565044');
+    base.addColorStop(1, '#675744');
   } else {
-    base.addColorStop(0, '#35342c');
-    base.addColorStop(0.55, '#403c32');
-    base.addColorStop(1, '#4a443a');
+    base.addColorStop(0, '#202A34');
+    base.addColorStop(0.55, '#2C3C49');
+    base.addColorStop(1, '#334B5F');
   }
   ctx.fillStyle = base;
   ctx.fillRect(0, 0, WALL_W, WALL_H);
 
-  // diagonal sunbeams (strong by day, ghosts at dusk)
-  beam(ctx, 620, 115, WALL_H, -364, '255, 200, 120', day ? 0.16 : 0.03);
-  beam(ctx, 350, 50, WALL_H, -364, '255, 200, 120', day ? 0.1 : 0.02);
+  // broad window-frame bands (warm by day, cool ghosts at dusk)
+  const bandColor = day ? '225, 190, 135' : '190, 210, 220';
+  beam(ctx, 620, 180, WALL_H, -364, bandColor, day ? 0.1 : 0.03);
+  beam(ctx, 350, 120, WALL_H, -364, bandColor, day ? 0.06 : 0.02);
 
   // pool of light behind the corkboard (world y 1.42 → canvas ~367)
-  pool(ctx, 512, 367, 330, day ? '255, 190, 110' : '140, 160, 190', day ? 0.14 : 0.08);
+  pool(ctx, 512, 367, 330, day ? '225, 164, 75' : '105, 130, 145', day ? 0.14 : 0.08);
 
   // desk line contact shadow (world y ~0.42 → canvas ~469)
   const shadow = ctx.createLinearGradient(0, 440, 0, WALL_H);
@@ -42,7 +43,7 @@ function paintWall(ctx, mode) {
 function paintDesk(ctx, mode) {
   const day = mode === 'day';
 
-  ctx.fillStyle = day ? '#b08046' : '#6f5c42';
+  ctx.fillStyle = day ? '#765137' : '#493B35';
   ctx.fillRect(0, 0, DESK_W, DESK_H);
 
   // plank seams
@@ -57,22 +58,23 @@ function paintDesk(ctx, mode) {
   // subtle grain
   ctx.strokeStyle = day ? 'rgba(140, 100, 55, 0.12)' : 'rgba(90, 75, 55, 0.1)';
   ctx.lineWidth = 1;
-  for (let i = 0; i < 40; i++) {
-    const y = Math.random() * DESK_H;
+  for (let i = 0; i < 48; i++) {
+    const y = (i * 73) % DESK_H;
+    const x = (i * 137) % DESK_W;
     ctx.beginPath();
-    ctx.moveTo(Math.random() * DESK_W, y);
-    ctx.lineTo(Math.random() * DESK_W, y + (Math.random() - 0.5) * 8);
+    ctx.moveTo(x, y);
+    ctx.bezierCurveTo(x + 90, y - 3, x + 180, y + 4, x + 280, y);
     ctx.stroke();
   }
 
-  // lamp light pool (lamp at world x 1.8, z -0.7) reaching toward the sketchbook
-  pool(ctx, 930, 150, 300, '255, 190, 110', day ? 0.3 : 0.06);
-  pool(ctx, 512, 437, 320, '255, 200, 130', day ? 0.22 : 0.05);
+  // Honey Lamp pools at the lamp origin and across the journal/sketchbook
+  pool(ctx, 930, 150, 300, '225, 164, 75', day ? 0.3 : 0.06);
+  pool(ctx, 620, 350, 360, '225, 164, 75', day ? 0.22 : 0.05);
   // cool window spill from the right by dusk
-  if (!day) pool(ctx, 980, 120, 260, '150, 170, 200', 0.1);
+  if (!day) pool(ctx, 980, 120, 260, '105, 130, 145', 0.1);
 
-  // sunbeam band falling across the desk
-  beam(ctx, 380, 200, DESK_H, -160, '255, 205, 130', day ? 0.12 : 0.02);
+  // window band falling across the desk
+  beam(ctx, 380, 200, DESK_H, -160, '225, 190, 135', day ? 0.12 : 0.02);
 
   // AO under every object footprint (x/z from main layout)
   ao(ctx, 512, 437, 160, 62, 0.34); // sketchbook
@@ -80,6 +82,7 @@ function paintDesk(ctx, mode) {
   ao(ctx, 768, 316, 128, 58, 0.34); // laptop
   ao(ctx, 209, 196, 120, 52, 0.32); // vinyl player
   ao(ctx, 930, 150, 70, 36, 0.35);  // lamp foot
+  ao(ctx, 647, 174, 44, 24, 0.32);  // tea cup
 
   // front edge falloff
   const edge = ctx.createLinearGradient(0, DESK_H - 60, 0, DESK_H);
@@ -96,11 +99,11 @@ function paintWindowPane(ctx, mode) {
   const g = ctx.createLinearGradient(0, 0, 0, 64);
   if (day) {
     // bright enough to cross the bloom threshold
-    g.addColorStop(0, '#f4faff');
-    g.addColorStop(1, '#c8dcec');
+    g.addColorStop(0, '#dce8ed');
+    g.addColorStop(1, '#9eb7c3');
   } else {
-    g.addColorStop(0, '#5a7490');
-    g.addColorStop(1, '#3a4c62');
+    g.addColorStop(0, '#526f82');
+    g.addColorStop(1, '#2f4658');
   }
   ctx.fillStyle = g;
   ctx.fillRect(0, 0, 64, 64);
@@ -112,7 +115,7 @@ export function createEnvironment() {
   // desk body (sides) — unlit flat wood
   const deskBody = new THREE.Mesh(
     new THREE.BoxGeometry(4.4, 0.09, 1.7),
-    new THREE.MeshBasicMaterial({ color: 0x8a6538 })
+    new THREE.MeshBasicMaterial({ color: 0x765137 })
   );
   deskBody.position.set(0, 0.375, -0.35);
   group.add(deskBody);
@@ -129,14 +132,14 @@ export function createEnvironment() {
 
   const deskEdge = new THREE.Mesh(
     new THREE.BoxGeometry(4.4, 0.18, 0.07),
-    new THREE.MeshBasicMaterial({ color: 0x77522c })
+    new THREE.MeshBasicMaterial({ color: 0x563822 })
   );
   deskEdge.position.set(0, 0.33, 0.53);
   group.add(deskEdge);
 
   const floor = new THREE.Mesh(
     new THREE.PlaneGeometry(10, 10),
-    new THREE.MeshBasicMaterial({ color: 0x2e2820 })
+    new THREE.MeshBasicMaterial({ color: 0x171b22 })
   );
   floor.rotation.x = -Math.PI / 2;
   group.add(floor);
@@ -153,7 +156,7 @@ export function createEnvironment() {
   // window — pane blooms by day, dims by dusk
   const windowFrame = new THREE.Mesh(
     new THREE.BoxGeometry(0.7, 0.9, 0.04),
-    new THREE.MeshBasicMaterial({ color: 0x5d4a2e })
+    new THREE.MeshBasicMaterial({ color: 0x493522 })
   );
   windowFrame.position.set(2.2, 1.8, -1.19);
   group.add(windowFrame);

@@ -7,7 +7,7 @@ export function createEngine(canvas) {
   renderer.setSize(window.innerWidth, window.innerHeight);
 
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x5d5440);
+  scene.background = new THREE.Color(0x171b22);
 
   const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 20);
 
