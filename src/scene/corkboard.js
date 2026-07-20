@@ -11,10 +11,7 @@ const NOTES = [
 ];
 const STRINGS = [[0, 1], [2, 3], [4, 5]];
 
-function makeTitleTexture() {
-  const cv = document.createElement('canvas');
-  cv.width = 1024;
-  cv.height = 640;
+function paintTitleCanvas(cv) {
   const g = cv.getContext('2d');
   g.fillStyle = '#e7dec9';
   g.fillRect(0, 0, 1024, 640);
@@ -35,7 +32,25 @@ function makeTitleTexture() {
   g.fillStyle = '#493b35';
   g.font = '600 128px Caveat, cursive';
   g.fillText('Ritvik Gupta', 512, 430);
-  return new THREE.CanvasTexture(cv);
+}
+
+function makeTitleTexture() {
+  const cv = document.createElement('canvas');
+  cv.width = 1024;
+  cv.height = 640;
+  paintTitleCanvas(cv);
+
+  const texture = new THREE.CanvasTexture(cv);
+  const fontsReady = document.fonts?.ready;
+  if (fontsReady) {
+    Promise.resolve(fontsReady)
+      .then(() => {
+        paintTitleCanvas(cv);
+        texture.needsUpdate = true;
+      })
+      .catch(() => {});
+  }
+  return texture;
 }
 
 export function createCorkboard() {

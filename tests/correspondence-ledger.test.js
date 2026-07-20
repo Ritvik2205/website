@@ -145,6 +145,30 @@ describe('Monsoon Postroom 3D correspondence ledger', () => {
     expect(spriteMesh.scale.y).toBeLessThanOrEqual(1.3);
     expect(ephemera.position.y + spriteMesh.position.y).toBeCloseTo(0);
   });
+
+  it('repaints the existing route-ledger texture when document fonts become ready', async () => {
+    let resolveFonts;
+    const fontsReady = new Promise((resolve) => { resolveFonts = resolve; });
+    document.fonts = { ready: fontsReady };
+
+    const { group } = createCorkboard();
+    const title = group.children.find(({ geometry }) => (
+      geometry?.type === 'PlaneGeometry'
+      && geometry.parameters.width === 1.24
+      && geometry.parameters.height === 0.78
+    ));
+    const texture = title.material.map;
+    const initialVersion = texture.version;
+
+    expect(textDraws).toHaveLength(2);
+    resolveFonts();
+    await fontsReady;
+    await Promise.resolve();
+
+    expect(textDraws).toHaveLength(4);
+    expect(texture.version).toBeGreaterThan(initialVersion);
+    expect(title.material.map).toBe(texture);
+  });
 });
 
 describe('Monsoon Postroom DOM correspondence ledger contract', () => {
