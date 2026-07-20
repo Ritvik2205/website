@@ -15,6 +15,10 @@ export function createSprite(url, { height = 1, fallback = null } = {}) {
     transparent: true, alphaTest: 0.08,
   });
   const mesh = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), material);
+  const raycast = mesh.raycast;
+  mesh.visible = false;
+  mesh.raycast = () => {};
+  group.add(mesh);
 
   new THREE.ImageLoader().load(url, (img) => {
     const cv = document.createElement('canvas');
@@ -48,8 +52,12 @@ export function createSprite(url, { height = 1, fallback = null } = {}) {
     material.needsUpdate = true;
     mesh.scale.set(height * (w / h), height, 1);
     mesh.position.y = height / 2; // bottom edge rests at group origin
-    if (fallback) fallback.visible = false;
-    group.add(mesh);
+    mesh.raycast = raycast;
+    mesh.visible = true;
+    if (fallback) {
+      fallback.visible = false;
+      group.remove(fallback);
+    }
     group.userData.assetStatus = 'loaded';
   }, undefined, () => {
     group.userData.assetStatus = 'error';
