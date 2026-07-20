@@ -1,12 +1,12 @@
 import gsap from 'gsap';
 
 const BOOT_LINES = [
-  'LOADING RITVIK.SYS...',
-  'MOUNTING /desk...',
-  'LAMP... OK',
-  'VINYL... OK',
-  'MEMORIES... OK',
-  'WELCOME.',
+  'OPENING MONSOON POSTROOM...',
+  'INDEXING LETTERS...',
+  'ROUTING PROJECT ARCHIVE...',
+  'PINNING FIELD NOTES...',
+  'WARMING DESK LAMP...',
+  'POSTROOM READY.',
 ];
 
 export function runIntro(camera, rig) {
@@ -25,11 +25,14 @@ export function runIntro(camera, rig) {
     intro.innerHTML = `
       <button class="intro-skip">skip ›</button>
       <div class="intro-floppy-stage">
-        <button class="floppy" aria-label="boot">
-          <span class="floppy-shutter"></span>
-          <span class="floppy-label">RITVIK.SYS</span>
+        <button class="floppy" aria-label="Open the Monsoon Postroom">
+          <img class="floppy-art" src="/assets/postroom/floppy.png" alt="" />
+          <span class="floppy-fallback" aria-hidden="true">
+            <span class="floppy-shutter"></span>
+            <span class="floppy-label">POSTROOM / 01</span>
+          </span>
         </button>
-        <p class="intro-prompt">click the floppy to boot</p>
+        <p class="intro-prompt">insert correspondence disk</p>
       </div>
       <pre class="intro-boot" hidden></pre>`;
     document.body.appendChild(intro);
@@ -58,7 +61,12 @@ export function runIntro(camera, rig) {
 
     intro.querySelector('.intro-skip').addEventListener('click', () => finish(true));
 
-    intro.querySelector('.floppy').addEventListener('click', async () => {
+    const floppy = intro.querySelector('.floppy');
+    intro.querySelector('.floppy-art').addEventListener('error', () => {
+      floppy.classList.add('asset-missing');
+    });
+
+    floppy.addEventListener('click', async () => {
       intro.querySelector('.intro-floppy-stage').hidden = true;
       const boot = intro.querySelector('.intro-boot');
       boot.hidden = false;
