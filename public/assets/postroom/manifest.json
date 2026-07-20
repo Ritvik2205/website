@@ -1,0 +1,13 @@
+{
+  "direction": "monsoon-postroom",
+  "source": "local-placeholder",
+  "generationCredits": 0,
+  "replaceable": true,
+  "assets": [
+    { "id": "lamp", "path": "/assets/postroom/lamp.png" },
+    { "id": "turntable", "path": "/assets/postroom/turntable.png" },
+    { "id": "teacup", "path": "/assets/postroom/teacup.png" },
+    { "id": "ephemera", "path": "/assets/postroom/ephemera.png" },
+    { "id": "floppy", "path": "/assets/postroom/floppy.png" }
+  ]
+}
