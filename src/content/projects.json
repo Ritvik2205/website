@@ -1,0 +1,38 @@
+[
+  {
+    "id": "portfolio-engine",
+    "title": "Portfolio Engine",
+    "description": "This site — a first-person 3D desk built with three.js and GSAP. Placeholder description: swap in the real story of how it works.",
+    "tech": ["three.js", "GSAP", "Vite"],
+    "image": "/placeholders/project-1.svg",
+    "repoUrl": "https://github.com/ritvikgupta",
+    "liveUrl": null
+  },
+  {
+    "id": "ml-experiments",
+    "title": "ML Experiments",
+    "description": "Placeholder: machine learning side projects and experiments. Replace with a real project write-up.",
+    "tech": ["Python", "PyTorch"],
+    "image": "/placeholders/project-2.svg",
+    "repoUrl": "https://github.com/ritvikgupta",
+    "liveUrl": null
+  },
+  {
+    "id": "pair-trading",
+    "title": "Pair Trading Research",
+    "description": "Placeholder: statistical arbitrage research — cointegration testing and backtesting on equity pairs.",
+    "tech": ["Python", "pandas", "NumPy"],
+    "image": "/placeholders/project-3.svg",
+    "repoUrl": "https://github.com/ritvikgupta",
+    "liveUrl": null
+  },
+  {
+    "id": "rust-interpreter",
+    "title": "Rust Interpreter",
+    "description": "Placeholder: a tree-walking interpreter written in Rust. Replace with language features and design notes.",
+    "tech": ["Rust"],
+    "image": "/placeholders/project-4.svg",
+    "repoUrl": "https://github.com/ritvikgupta",
+    "liveUrl": null
+  }
+]

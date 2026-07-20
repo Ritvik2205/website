@@ -1,0 +1,38 @@
+.intro {
+  position: fixed; inset: 0; z-index: 50; background: #0a0a0a;
+  display: flex; align-items: center; justify-content: center;
+}
+.intro-skip {
+  position: absolute; top: 22px; right: 26px; background: none; cursor: pointer;
+  border: 1px solid #3a3a3a; border-radius: 6px; padding: 6px 14px;
+  font: 600 18px var(--font-hand); color: #8a8a8a;
+}
+.intro-skip:hover { color: var(--warm); border-color: var(--warm); }
+.intro-floppy-stage { display: flex; flex-direction: column; align-items: center; gap: 26px; }
+.intro [hidden] { display: none !important; }
+.floppy {
+  position: relative; width: 190px; height: 190px; cursor: pointer;
+  background: #2e2e38; border: none; border-radius: 6px 22px 6px 6px;
+  box-shadow: 0 14px 50px rgba(0,0,0,.8), inset 0 0 0 2px #24242c;
+  transition: transform .25s;
+}
+.floppy:hover { transform: translateY(-6px) rotate(-1.5deg); }
+.floppy-shutter {
+  position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+  width: 92px; height: 58px; background: #9aa0a8; border-radius: 0 0 4px 4px;
+}
+.floppy-shutter::after {
+  content: ''; position: absolute; top: 9px; right: 14px;
+  width: 26px; height: 40px; background: #2e2e38;
+}
+.floppy-label {
+  position: absolute; bottom: 14px; left: 50%; transform: translateX(-50%);
+  width: 120px; padding: 14px 8px;
+  background: #ece6da; color: #3a3226;
+  font: 700 15px var(--font-mono); letter-spacing: 1px;
+}
+.intro-prompt { font: 600 26px var(--font-hand); color: var(--warm); margin: 0; }
+.intro-boot {
+  font: 400 18px/1.9 var(--font-mono); color: #4ade4a; margin: 0;
+  text-shadow: 0 0 8px rgba(74, 222, 74, .5); min-width: 340px;
+}

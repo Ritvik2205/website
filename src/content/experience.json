@@ -1,0 +1,44 @@
+[
+  {
+    "id": "internship",
+    "type": "ruled",
+    "title": "Internship @ ...",
+    "body": "Placeholder: internship details — team, what you built, impact. Replace with the real experience.",
+    "connections": ["cmu"]
+  },
+  {
+    "id": "cmu",
+    "type": "sticky",
+    "title": "CMU",
+    "body": "Placeholder: studying at Carnegie Mellon. Courses, focus areas, activities.",
+    "connections": ["hackathon"]
+  },
+  {
+    "id": "hackathon",
+    "type": "ruled",
+    "title": "Hackathon win",
+    "body": "Placeholder: Neuphonic Edinburgh hackathon — what the team built and how it went.",
+    "connections": []
+  },
+  {
+    "id": "photo-note",
+    "type": "polaroid",
+    "title": "somewhere in London",
+    "body": "Placeholder: a photo and the story behind it.",
+    "connections": ["misc"]
+  },
+  {
+    "id": "misc",
+    "type": "sticky",
+    "title": "todo",
+    "body": "Placeholder: things I'm currently exploring — replace with a real list.",
+    "connections": []
+  },
+  {
+    "id": "trading",
+    "type": "ruled",
+    "title": "IMC Prosperity",
+    "body": "Placeholder: algorithmic trading competition — strategy and results.",
+    "connections": ["internship"]
+  }
+]

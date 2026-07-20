@@ -1,0 +1,11 @@
+.overlay-page {
+  position: fixed; inset: 0; display: none; overflow-y: auto;
+  background: rgba(16, 14, 10, 0.97); color: var(--paper);
+}
+.overlay-page.visible { display: block; }
+.overlay-back {
+  position: fixed; top: 20px; left: 24px; z-index: 10; cursor: pointer;
+  background: none; border: 1px solid var(--warm); border-radius: 6px;
+  color: var(--warm); font: 600 20px var(--font-hand); padding: 6px 14px;
+}
+.overlay-back:hover { background: rgba(212, 168, 104, 0.15); }

@@ -1,0 +1,10 @@
+[
+  { "src": "/placeholders/art-1.svg", "caption": "profile study", "type": "sketch" },
+  { "src": "/placeholders/art-2.svg", "caption": "rainy street", "type": "photo" },
+  { "src": "/placeholders/art-3.svg", "caption": "hands practice", "type": "sketch" },
+  { "src": "/placeholders/art-4.svg", "caption": "golden hour", "type": "photo" },
+  { "src": "/placeholders/art-5.svg", "caption": "still life", "type": "sketch" },
+  { "src": "/placeholders/art-6.svg", "caption": "city lights", "type": "photo" },
+  { "src": "/placeholders/art-7.svg", "caption": "gesture drawings", "type": "sketch" },
+  { "src": "/placeholders/art-8.svg", "caption": "fog on the bridge", "type": "photo" }
+]
