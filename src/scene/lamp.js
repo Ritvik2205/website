@@ -17,9 +17,33 @@ function makeGlowTexture() {
   return new THREE.CanvasTexture(cv);
 }
 
+function createFallback() {
+  const group = new THREE.Group();
+  const base = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.14, 0.17, 0.05, 24),
+    new THREE.MeshBasicMaterial({ color: 0xa77a3f }),
+  );
+  base.position.y = 0.025;
+  const stem = new THREE.Mesh(
+    new THREE.BoxGeometry(0.035, 0.36, 0.035),
+    new THREE.MeshBasicMaterial({ color: 0xa77a3f }),
+  );
+  stem.position.set(0.04, 0.23, 0);
+  stem.rotation.z = -0.12;
+  const shade = new THREE.Mesh(
+    new THREE.BoxGeometry(0.28, 0.13, 0.16),
+    new THREE.MeshBasicMaterial({ color: 0x688178 }),
+  );
+  shade.position.set(-0.03, 0.48, 0);
+  shade.rotation.z = -0.12;
+  group.add(base, stem, shade);
+  return group;
+}
+
 export function createLamp() {
   const group = new THREE.Group();
-  group.add(createSprite('/assets/lamp.png', { height: 0.66 }));
+  const fallback = createFallback();
+  group.add(createSprite('/assets/postroom/lamp.png', { height: 0.66, fallback }));
 
   // bright additive glow over the bulb cage — this is what blooms
   const glowMaterial = new THREE.MeshBasicMaterial({

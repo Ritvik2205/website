@@ -8,6 +8,7 @@ import { createSketchbook } from './scene/sketchbook.js';
 import { createJournal } from './scene/journal.js';
 import { createVinyl } from './scene/vinyl.js';
 import { createLamp } from './scene/lamp.js';
+import { createTeaCup } from './scene/teaCup.js';
 import { createCorkboard } from './scene/corkboard.js';
 import { createAtmosphere } from './scene/atmosphere.js';
 import { registerUnlitGroup } from './render/bakedMaterial.js';
@@ -37,6 +38,10 @@ engine.onTick(() => rig.update());
 const environment = createEnvironment();
 scene.add(environment.group);
 registerUnlitGroup(environment.group); // desk body/edge, floor, window frame follow the mood
+
+const teaCup = createTeaCup();
+scene.add(teaCup.group);
+registerUnlitGroup(teaCup.group);
 
 // Future Blender bakes drop in here (see docs/design/2026-07-06-baked-rendering-philosophy.md):
 // const { group } = await loadBakedModel({

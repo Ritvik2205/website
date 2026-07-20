@@ -3,12 +3,18 @@ import * as THREE from 'three';
 // Textured plane from a transparent PNG, trimmed to its opaque bounding box
 // so the raycast area hugs the artwork. Unlit: the PNG art carries its own
 // shading (baked-rendering rule — see docs/design).
-export function createSprite(url, { height = 1 } = {}) {
+export function createSprite(url, { height = 1, fallback = null } = {}) {
+  const group = new THREE.Group();
+  group.userData.assetStatus = 'loading';
+  if (fallback) {
+    fallback.visible = true;
+    group.add(fallback);
+  }
+
   const material = new THREE.MeshBasicMaterial({
     transparent: true, alphaTest: 0.08,
   });
   const mesh = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), material);
-  mesh.visible = false;
 
   new THREE.ImageLoader().load(url, (img) => {
     const cv = document.createElement('canvas');
@@ -42,8 +48,12 @@ export function createSprite(url, { height = 1 } = {}) {
     material.needsUpdate = true;
     mesh.scale.set(height * (w / h), height, 1);
     mesh.position.y = height / 2; // bottom edge rests at group origin
-    mesh.visible = true;
+    if (fallback) fallback.visible = false;
+    group.add(mesh);
+    group.userData.assetStatus = 'loaded';
+  }, undefined, () => {
+    group.userData.assetStatus = 'error';
   });
 
-  return mesh;
+  return group;
 }
