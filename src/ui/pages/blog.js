@@ -50,6 +50,11 @@ export function createBlogPage(posts) {
     if (flipping) return;
     flipping = true;
     const current = pagesEl.firstElementChild;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      current.replaceWith(nextPage);
+      flipping = false;
+      return;
+    }
     pagesEl.insertBefore(nextPage, current);
     gsap.set(nextPage, { rotationY: backwards ? 0 : 0 });
     gsap.set(current, { zIndex: 2, transformOrigin: 'left center' });

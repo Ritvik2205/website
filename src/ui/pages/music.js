@@ -1,6 +1,7 @@
 import gsap from 'gsap';
 
 export function createMusicPage(site) {
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const el = document.createElement('div');
   el.className = 'music-page';
   el.innerHTML = `
@@ -25,9 +26,11 @@ export function createMusicPage(site) {
   let spinTween = null;
   const hooks = {
     onOpen: () => {
-      spinTween = gsap.to(el.querySelector('.vinyl-disc'), {
-        rotation: 360, repeat: -1, ease: 'none', duration: 3,
-      });
+      if (!reduced) {
+        spinTween = gsap.to(el.querySelector('.vinyl-disc'), {
+          rotation: 360, repeat: -1, ease: 'none', duration: 3,
+        });
+      }
     },
     onClose: () => { spinTween?.kill(); spinTween = null; },
   };

@@ -5,9 +5,9 @@ function makeSketchTexture() {
   cv.width = 256;
   cv.height = 320;
   const g = cv.getContext('2d');
-  g.fillStyle = '#f0ebe0';
+  g.fillStyle = '#e7dec9';
   g.fillRect(0, 0, 256, 320);
-  g.strokeStyle = '#999';
+  g.strokeStyle = '#688178';
   g.lineWidth = 2;
   // loose face-profile doodle
   g.beginPath();
@@ -30,7 +30,7 @@ function makeSketchTexture() {
 
 export function createSketchbook() {
   const group = new THREE.Group();
-  const paper = new THREE.MeshBasicMaterial({ color: 0xf0ebe0 });
+  const paper = new THREE.MeshBasicMaterial({ color: 0xe7dec9 });
 
   const leftPage = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.015, 0.3), paper.clone());
   leftPage.material.map = makeSketchTexture();
@@ -43,11 +43,11 @@ export function createSketchbook() {
 
   const spine = new THREE.Mesh(
     new THREE.BoxGeometry(0.015, 0.02, 0.3),
-    new THREE.MeshBasicMaterial({ color: 0xbbb3a0 })
+    new THREE.MeshBasicMaterial({ color: 0xa77a3f })
   );
   spine.position.y = 0.008;
 
-  const pencilColors = [0xd4a030, 0x666666, 0xc44444];
+  const pencilColors = [0x688178, 0xa77a3f, 0x688178];
   pencilColors.forEach((color, i) => {
     const pencil = new THREE.Mesh(
       new THREE.CylinderGeometry(0.006, 0.006, 0.14, 8),

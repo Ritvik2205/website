@@ -16,7 +16,7 @@ void main() {
 
 export function createLaptop() {
   const group = new THREE.Group();
-  const dark = new THREE.MeshBasicMaterial({ color: 0x22201e });
+  const dark = new THREE.MeshBasicMaterial({ color: 0x171b22 });
 
   const base = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.02, 0.3), dark);
   base.position.y = 0.01;
@@ -29,13 +29,20 @@ export function createLaptop() {
   cv.width = 512;
   cv.height = 320;
   const g = cv.getContext('2d');
-  g.fillStyle = '#0a0a18';
+  g.fillStyle = '#171b22';
   g.fillRect(0, 0, 512, 320);
   g.font = '24px monospace';
-  g.fillStyle = '#7aa8ff';
+  g.fillStyle = '#e7dec9';
   g.fillText('$ ~/projects', 24, 48);
-  g.fillStyle = '#5aba5a';
-  ['├── portfolio', '├── ml-engine', '└── api-server'].forEach((t, i) => g.fillText(t, 24, 92 + i * 40));
+  ['portfolio', 'ml-engine', 'api-server'].forEach((project, i) => {
+    const y = 92 + i * 40;
+    g.fillStyle = '#688178';
+    g.fillText(i === 2 ? '└──' : '├──', 24, y);
+    g.fillStyle = '#e7dec9';
+    g.fillText(project, 84, y);
+  });
+  g.fillStyle = '#e1a44b';
+  g.fillRect(24, 246, 14, 28);
   const screenTexture = new THREE.CanvasTexture(cv);
   screenTexture.colorSpace = THREE.SRGBColorSpace;
 
