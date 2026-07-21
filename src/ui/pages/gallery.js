@@ -21,18 +21,19 @@ export function createGalleryPage(gallery) {
   });
 
   for (const item of gallery) {
-    const fig = document.createElement('figure');
-    fig.className = `gallery-item gallery-item--${item.type}`;
-    fig.innerHTML = `
-      <img src="${item.src}" alt="${item.caption}" loading="lazy" />
-      <figcaption>${item.caption}</figcaption>`;
-    fig.addEventListener('click', () => {
+    const itemButton = document.createElement('button');
+    itemButton.type = 'button';
+    itemButton.className = `gallery-item gallery-item--${item.type}`;
+    itemButton.innerHTML = `
+      <img src="${item.src}" alt="" loading="lazy" />
+      <span class="gallery-caption">${item.caption}</span>`;
+    itemButton.addEventListener('click', () => {
       lightbox.querySelector('img').src = item.src;
       lightbox.querySelector('figcaption').textContent = item.caption;
       lightbox.classList.add('visible');
       el.focus();
     });
-    strip.appendChild(fig);
+    strip.appendChild(itemButton);
   }
 
   // vertical wheel drives horizontal scroll

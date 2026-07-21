@@ -40,7 +40,7 @@ describe('Monsoon Postroom shared typography', () => {
     expect(css).toMatch(/\.page-heading\s*\{[^}]*var\(--font-display\)/s);
     expect(css).toMatch(/\.window-title\s*\{[^}]*var\(--font-display\)/s);
     expect(css).toMatch(/\.route-mark\s*\{[^}]*var\(--font-mono\)/s);
-    expect(css).toMatch(/\.gallery-item figcaption\s*\{[^}]*var\(--font-hand\)/s);
+    expect(css).toMatch(/\.gallery-caption\s*\{[^}]*var\(--font-hand\)/s);
     expect(css).toMatch(/\.post-body\s*\{[^}]*var\(--font-display\)/s);
   });
 });
