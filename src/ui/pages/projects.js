@@ -4,7 +4,7 @@ export function createProjectsPage(projects) {
 
   const heading = document.createElement('h1');
   heading.className = 'page-heading page-heading--mono';
-  heading.textContent = '~/projects';
+  heading.textContent = 'PROJECT ROUTING DESK';
   el.appendChild(heading);
 
   const grid = document.createElement('div');
@@ -24,7 +24,7 @@ export function createProjectsPage(projects) {
 
     win.innerHTML = `
       <header class="window-titlebar">
-        <span class="dot dot--r"></span><span class="dot dot--y"></span><span class="dot dot--g"></span>
+        <span class="route-mark">FILE ${String(i + 1).padStart(2, '0')}</span>
         <span class="window-title">${p.title}</span>
       </header>
       <img class="window-preview" src="${p.image}" alt="${p.title} preview" />
