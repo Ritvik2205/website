@@ -1,24 +1,25 @@
-# Baked Rendering Guide
+# Realtime PBR Rendering Guide
 
-Read `../../docs/design/2026-07-06-baked-rendering-philosophy.md` before editing this directory. It is authoritative when older specs disagree with the implementation.
+Read `../../docs/design/2026-07-21-realtime-pbr-rendering.md` before editing this directory. It is authoritative when older bake docs disagree.
 
-## Non-Negotiable Rules
+## Rules
 
-- Do not add `AmbientLight`, `DirectionalLight`, `SpotLight`, runtime shadow maps, or physically lit prop materials. Light, shadow, and ambient occlusion are authored into textures or canvas bakes.
-- Use `MeshBasicMaterial` for unlit props and `createBakedMaterial()` for surfaces that participate in the global mood.
-- Keep one mood axis: `nightMix` is in `[0, 1]`; `1` is warm/lamp-on and `0` is cool dusk. Update registered materials through `setNightMix()`.
-- Glow comes from bright pixels crossing `UnrealBloomPass` thresholds, never from a light source.
-- Screens may use `ShaderMaterial` and `uTime` effects for scanlines or flicker.
+- Create lights only via `lighting.js` (`DirectionalLight` window, `HemisphereLight` fill, lamp `SpotLight`). Do not scatter lights inside scene factories.
+- Prefer `MeshStandardMaterial` for environment and props. Screens may use `ShaderMaterial` + `uTime`.
+- Mood axis: `lampMood` in `[0.15, 1]`; update through `setLampMood()`. Lamp on ≈ `1`, lamp off ≈ `0.15`.
+- Enable shadows on the engine renderer; props `castShadow`, desk/floor/wall `receiveShadow`.
+- Glow comes from emissive pixels crossing `UnrealBloomPass` thresholds plus the lamp spot.
+- `loadModel.js`: GLB textures use SRGB where appropriate; normalize height; convert non-standard materials when needed.
+- Legacy `bakedMaterial.js` / `bakeCanvas.js` may remain for tests or transitional sprites; do not use them for new room lighting.
 
 ## File Contracts
 
-- `bakeCanvas.js`: `createBakePair(width, height, paintFn)` paints paired day/night canvases; `paintFn(ctx, mode)` receives `mode` as `day` or `night`.
-- `bakedMaterial.js`: creates day/night shader materials and registers unlit groups for global mood dimming.
-- `composer.js`: preserve the `RenderPass → UnrealBloomPass → OutputPass` chain unless a documented visual change requires otherwise.
-- `bakedModel.js`: GLB textures use `flipY = false`, SRGB color space, and a shared baked material per group; loaded groups join the mood registry.
+- `lighting.js`: `createLighting(scene)`, `setLampMood`, `getLampMood`, `attachLampLight(target, shadeLocal?)`, `applyWindowFlashLevel(amount)`, `pulseWindowFlash(amount)`. Flash is transient and must re-enter through `applyMood`; it is not a second mood axis.
+- `loadModel.js`: `loadModel(url, { height })` → `{ group, status }`.
+- `composer.js`: keep `RenderPass → UnrealBloomPass → OutputPass` unless a documented visual change requires otherwise.
 
 ## Assets and Verification
 
-Do not copy unlicensed assets from the reference portfolio. Put future source models in `public/models/` and day/night atlases in `public/textures/` using the contract in the design doc.
+Put models in `public/models/` and PBR textures in `public/textures/`. Update `ATTRIBUTION.md` for every third-party file.
 
-Run `npm test` and `npm run build`; visually check both lamp moods, bloom readability, and reduced-motion behavior after rendering changes.
+Run `npm test` and `npm run build`; visually check lamp moods, window shadows, bloom readability, and reduced-motion behavior.

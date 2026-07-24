@@ -1,7 +1,8 @@
 import * as THREE from 'three';
 import gsap from 'gsap';
-import { createSprite } from './spriteAsset.js';
-import { setNightMix, getNightMix } from '../render/bakedMaterial.js';
+import { loadModel, markShadowCasters, nextFrame } from '../render/loadModel.js';
+import { setLampMood, getLampMood, attachLampLight } from '../render/lighting.js';
+import { LAYOUT, applyPose } from './layout.js';
 
 function makeGlowTexture() {
   const cv = document.createElement('canvas');
@@ -21,21 +22,24 @@ function createFallback() {
   const group = new THREE.Group();
   const base = new THREE.Mesh(
     new THREE.CylinderGeometry(0.14, 0.17, 0.05, 24),
-    new THREE.MeshBasicMaterial({ color: 0xa77a3f }),
+    new THREE.MeshStandardMaterial({ color: 0xa77a3f, roughness: 0.45, metalness: 0.35 }),
   );
   base.position.y = 0.025;
+  base.castShadow = true;
   const stem = new THREE.Mesh(
     new THREE.BoxGeometry(0.035, 0.36, 0.035),
-    new THREE.MeshBasicMaterial({ color: 0xa77a3f }),
+    new THREE.MeshStandardMaterial({ color: 0xa77a3f, roughness: 0.4, metalness: 0.4 }),
   );
   stem.position.set(0.04, 0.23, 0);
   stem.rotation.z = -0.12;
+  stem.castShadow = true;
   const shade = new THREE.Mesh(
     new THREE.BoxGeometry(0.28, 0.13, 0.16),
-    new THREE.MeshBasicMaterial({ color: 0x688178 }),
+    new THREE.MeshStandardMaterial({ color: 0x688178, roughness: 0.65, metalness: 0.1 }),
   );
   shade.position.set(-0.03, 0.48, 0);
   shade.rotation.z = -0.12;
+  shade.castShadow = true;
   group.add(base, stem, shade);
   return group;
 }
@@ -43,9 +47,12 @@ function createFallback() {
 export function createLamp() {
   const group = new THREE.Group();
   const fallback = createFallback();
-  group.add(createSprite('/assets/postroom/lamp.png', { height: 0.66, fallback }));
+  group.add(fallback);
 
-  // bright additive glow over the bulb cage — this is what blooms
+  const model = loadModel('/models/lamp.glb', { height: 0.62 });
+  model.visible = false;
+  group.add(model);
+
   const glowMaterial = new THREE.MeshBasicMaterial({
     map: makeGlowTexture(),
     transparent: true,
@@ -54,22 +61,43 @@ export function createLamp() {
     opacity: 0.95,
   });
   const glow = new THREE.Mesh(new THREE.PlaneGeometry(0.2, 0.2), glowMaterial);
-  glow.position.set(-0.135, 0.45, 0.03);
+  glow.position.set(-0.03, 0.48, 0.02);
+  glow.scale.setScalar(0.85);
   group.add(glow);
 
-  group.position.set(1.8, 0.42, -0.7);
+  const poll = () => {
+    if (model.userData.assetStatus === 'loaded') {
+      fallback.visible = false;
+      model.visible = true;
+      // Shade-local offset for the lamp.glb asset's cavity.
+      const shadeLocal = new THREE.Vector3(0, 0.42, 0.02);
+      glow.position.copy(shadeLocal);
+      attachLampLight(group, shadeLocal);
+    } else if (model.userData.assetStatus === 'error') {
+      model.visible = false;
+      fallback.visible = true;
+    } else {
+      nextFrame(poll);
+    }
+  };
+  nextFrame(poll);
+
+  markShadowCasters(group);
+  applyPose(group, LAYOUT.lamp);
+  // Fallback attach before the GLB load resolves; re-attached with the
+  // asset-specific shade offset once loaded (see `poll` above).
+  queueMicrotask(() => attachLampLight(group));
 
   let on = true;
 
-  // whole-room mood crossfade: nightMix 1 = lamp on (warm bakes), 0.15 = off (cool dusk)
   function toggle() {
     on = !on;
-    const proxy = { v: getNightMix() };
+    const proxy = { v: getLampMood() };
     gsap.to(proxy, {
       v: on ? 1 : 0.15,
       duration: 0.6,
       ease: 'power2.inOut',
-      onUpdate: () => setNightMix(proxy.v),
+      onUpdate: () => setLampMood(proxy.v),
     });
     gsap.to(glowMaterial, { opacity: on ? 0.95 : 0, duration: 0.4, ease: 'power2.out' });
   }
