@@ -36,7 +36,7 @@ describe('createInteractions hover UI', () => {
     expect(created.every((el) => el.className !== 'hover-label')).toBe(true);
   });
 
-  it('warm-tints meshes that are added to a group after registration', () => {
+  it('shows silhouette outline meshes for late-added meshes without tint or lift', () => {
     vi.stubGlobal('document', { body: { style: {} } });
     vi.stubGlobal('window', { innerWidth: 800, innerHeight: 600 });
 
@@ -47,11 +47,9 @@ describe('createInteractions hover UI', () => {
     camera.updateMatrixWorld(true);
 
     const interactions = createInteractions(camera, dom);
-
     const group = new THREE.Group();
     interactions.register({ group, id: 'laptop', label: 'Laptop', onClick: vi.fn() });
 
-    // Stand-in for a GLB mesh that streams in after register() has run.
     const lateMesh = new THREE.Mesh(
       new THREE.BoxGeometry(0.2, 0.2, 0.2),
       new THREE.MeshStandardMaterial({ color: 0x336699, emissive: 0x000000 }),
@@ -59,14 +57,21 @@ describe('createInteractions hover UI', () => {
     group.add(lateMesh);
     group.updateMatrixWorld(true);
     const baseEmissive = lateMesh.material.emissive.getHex();
+    const baseY = group.position.y;
 
     listeners.pointermove({ clientX: 400, clientY: 300 });
     interactions.update();
-    expect(lateMesh.material.emissive.getHex()).not.toBe(baseEmissive);
-    expect(lateMesh.material.emissiveIntensity).toBeGreaterThan(0);
+
+    const outlines = [];
+    group.traverse((o) => { if (o.userData?.isHoverOutline) outlines.push(o); });
+    expect(outlines.length).toBeGreaterThan(0);
+    expect(outlines.every((o) => o.visible)).toBe(true);
+    expect(lateMesh.material.emissive.getHex()).toBe(baseEmissive);
+    expect(group.position.y).toBeCloseTo(baseY, 5);
+    expect(gsap.to).not.toHaveBeenCalled();
 
     listeners.pointermove({ clientX: -5000, clientY: -5000 });
     interactions.update();
-    expect(lateMesh.material.emissive.getHex()).toBe(baseEmissive);
+    expect(outlines.every((o) => !o.visible)).toBe(true);
   });
 });

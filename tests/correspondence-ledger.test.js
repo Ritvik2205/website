@@ -51,7 +51,7 @@ afterEach(() => {
 
 describe('Investigation corkboard (3D)', () => {
   it('builds a dense board with cork frame, many fillers, and red string web', () => {
-    const { group, id, skipHoverVisual, skipHoverLift } = createCorkboard();
+    const { group, id, skipHoverVisual } = createCorkboard();
     const boxMeshes = group.children.filter(
       (child) => child.isMesh && child.geometry.type === 'BoxGeometry',
     );
@@ -69,7 +69,6 @@ describe('Investigation corkboard (3D)', () => {
 
     expect(id).toBe('experience');
     expect(skipHoverVisual).toBe(true);
-    expect(skipHoverLift).toBe(true);
     expect(board.material.color.getHex()).toBe(0x8a6948);
     expect(frames).toHaveLength(4);
     expect(fillerGroups.length).toBeGreaterThanOrEqual(CORK_FILLERS.length);
@@ -125,9 +124,9 @@ describe('Hover skip flags', () => {
   it('documents skipHoverVisual on the corkboard factory', async () => {
     const source = await readSource('../src/scene/corkboard.js');
     expect(source).toContain('skipHoverVisual: true');
-    expect(source).toContain('skipHoverLift: true');
+    expect(source).not.toContain('skipHoverLift');
     const interactions = await readSource('../src/core/interactions.js');
     expect(interactions).toContain('skipHoverVisual');
-    expect(interactions).toContain('skipHoverLift');
+    expect(interactions).not.toContain('skipHoverLift');
   });
 });

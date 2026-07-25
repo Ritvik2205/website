@@ -241,8 +241,7 @@ export function createCorkboard() {
     group,
     id: 'experience',
     label: 'the board',
-    // Wall-mounted: no warm tint / lift on hover
+    // Wall-mounted: cursor only, no silhouette outline
     skipHoverVisual: true,
-    skipHoverLift: true,
   };
 }

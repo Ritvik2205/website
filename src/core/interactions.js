@@ -1,5 +1,7 @@
 import * as THREE from 'three';
-import gsap from 'gsap';
+
+const OUTLINE_COLOR = 0xffd9a0;
+const OUTLINE_SCALE = 1.06;
 
 export function createInteractions(camera, domElement) {
   const raycaster = new THREE.Raycaster();
@@ -16,57 +18,52 @@ export function createInteractions(camera, domElement) {
     if (enabled && hovered) hovered.onClick(hovered);
   });
 
-  const HOVER_EMISSIVE = new THREE.Color(0xffd9a0);
+  function makeOutlineMesh(source) {
+    const mat = new THREE.MeshBasicMaterial({
+      color: OUTLINE_COLOR,
+      side: THREE.BackSide,
+      depthWrite: false,
+      transparent: true,
+      opacity: 0.9,
+    });
+    const outline = new THREE.Mesh(source.geometry, mat);
+    outline.visible = false;
+    outline.userData.isHoverOutline = true;
+    outline.raycast = () => {};
+    return outline;
+  }
 
-  // GLB meshes stream in after register(), so the untinted base has to be
-  // captured on first touch rather than only at registration time.
-  function captureBase(o, mat) {
-    if (mat.emissive) {
-      if (!mat.userData.baseEmissive) {
-        mat.userData.baseEmissive = mat.emissive.clone();
-        mat.userData.baseEmissiveIntensity = mat.emissiveIntensity ?? 0;
-      }
-    } else if (mat.color && o.userData.baseColor === undefined) {
-      o.userData.baseColor = mat.color.getHex();
-    }
+  function ensureOutlines(item) {
+    if (item.skipHoverVisual) return;
+    if (!item.outlinedUuids) item.outlinedUuids = new Set();
+    if (!item.outlines) item.outlines = [];
+
+    item.group.traverse((o) => {
+      if (!o.isMesh || !o.geometry) return;
+      if (o.userData.isHoverOutline) return;
+      if (item.outlinedUuids.has(o.uuid)) return;
+
+      const outline = makeOutlineMesh(o);
+      outline.position.copy(o.position);
+      outline.rotation.copy(o.rotation);
+      outline.scale.copy(o.scale).multiplyScalar(OUTLINE_SCALE);
+      o.parent.add(outline);
+      item.outlinedUuids.add(o.uuid);
+      item.outlines.push(outline);
+    });
   }
 
   function register(item) {
-    item.baseY = item.group.position.y;
-    item.group.traverse((o) => {
-      if (!o.isMesh || !o.material) return;
-      const materials = Array.isArray(o.material) ? o.material : [o.material];
-      for (const mat of materials) captureBase(o, mat);
-    });
+    item.outlines = [];
+    item.outlinedUuids = new Set();
+    ensureOutlines(item);
     items.push(item);
   }
 
   function applyHover(item, on) {
-    if (!item.skipHoverVisual) {
-      item.group.traverse((o) => {
-        if (!o.isMesh || !o.material) return;
-        const materials = Array.isArray(o.material) ? o.material : [o.material];
-        for (const mat of materials) {
-          captureBase(o, mat);
-          if (mat.emissive && mat.userData.baseEmissive) {
-            mat.emissive.copy(mat.userData.baseEmissive);
-            mat.emissiveIntensity = mat.userData.baseEmissiveIntensity ?? 0;
-            if (on) {
-              mat.emissive.lerp(HOVER_EMISSIVE, 0.55);
-              mat.emissiveIntensity = Math.max(mat.emissiveIntensity, 0.35);
-            }
-          } else if (mat.color && o.userData.baseColor !== undefined) {
-            mat.color.setHex(o.userData.baseColor);
-            if (on) mat.color.lerp(HOVER_EMISSIVE, 0.35);
-          }
-        }
-      });
-    }
-    if (!item.skipHoverLift) {
-      gsap.to(item.group.position, {
-        y: item.baseY + (on ? 0.04 : 0), duration: 0.35, ease: 'power2.out',
-      });
-    }
+    if (item.skipHoverVisual) return;
+    ensureOutlines(item);
+    for (const outline of item.outlines || []) outline.visible = !!on;
   }
 
   function setHover(item) {
@@ -79,6 +76,10 @@ export function createInteractions(camera, domElement) {
 
   function update() {
     if (!enabled) { setHover(null); return; }
+
+    for (const item of items) ensureOutlines(item);
+    if (hovered && !hovered.skipHoverVisual) applyHover(hovered, true);
+
     raycaster.setFromCamera(pointer, camera);
     let found = null;
     let nearest = Infinity;
