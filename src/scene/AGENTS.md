@@ -13,7 +13,7 @@
 - Props and environment use `MeshStandardMaterial` (or screen shaders). Prefer GLBs via `loadModel` with procedural Standard fallbacks.
 - Do not create lights inside factories; lamp mood goes through `setLampMood` from `src/render/lighting.js`.
 - `environment.js` returns `{ group, windowPane }`. Atmosphere may drive `windowPane.material.emissiveIntensity` for lightning; do not create lights in environment.
-- The desk surface is around `y = 0.42` and the wall around `z = -1.2`; inspect `layout.js`, `environment.js`, and camera anchors before changing placement.
+- The desk surface is around `y = 0.44` and the wall around `z = -1.2`; inspect `layout.js`, `environment.js`, and camera anchors before changing placement.
 - Keep each root `Group` replaceable so internals can swap to another GLB without changing interaction IDs.
 - Atmosphere owns the window storm plane, three rain layers, and lightning timing. It calls `applyWindowFlashLevel` from lighting and may pulse `windowPane` emissive. Respect reduced-motion (no rain, no lightning).
 

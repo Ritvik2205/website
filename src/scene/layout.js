@@ -1,8 +1,12 @@
 import * as THREE from 'three';
 
-const DESK_Y = 0.42;
+// Top face of deskTop mesh (center 0.42, height 0.04 → surface at 0.44)
+const DESK_Y = 0.44;
 
-/** Densified desk poses — shared by factories and camera anchors. */
+/**
+ * Left-to-right desk order on a shallow top:
+ * plant → books → vinyl → journal → sketchbook → penCup → teaCup → laptop → keyboard → lamp
+ */
 export const LAYOUT = {
   deskY: DESK_Y,
   corkboard: {
@@ -11,60 +15,60 @@ export const LAYOUT = {
     scale: 1.08,
   },
   vinyl: {
-    position: [-0.72, DESK_Y, -0.55],
-    rotation: [0, 0.18, 0],
-    scale: 1.15,
-  },
-  journal: {
-    position: [-0.5, DESK_Y, 0.05],
-    rotation: [0, 0.28, 0],
-    scale: 1.2,
-  },
-  sketchbook: {
-    position: [0, DESK_Y, 0.12],
-    rotation: [0, 0.04, 0],
-    scale: 1.25,
-  },
-  laptop: {
-    position: [0.55, DESK_Y, -0.2],
-    rotation: [0, -0.38, 0],
-    scale: 1.15,
-  },
-  lamp: {
-    position: [0.95, DESK_Y, -0.55],
-    rotation: [0, -0.35, 0],
-    scale: 1.1,
-  },
-  teaCup: {
-    position: [0.32, DESK_Y, -0.45],
-    rotation: [0, -0.1, 0],
+    position: [-0.55, DESK_Y, -0.55],
+    rotation: [0, 0.12, 0],
     scale: 1.05,
   },
+  journal: {
+    position: [-0.12, DESK_Y, -0.28],
+    rotation: [0, 0.14, 0],
+    scale: 1.1,
+  },
+  sketchbook: {
+    position: [0.32, DESK_Y, -0.22],
+    rotation: [0, 0.02, 0],
+    scale: 1.1,
+  },
+  laptop: {
+    position: [0.9, DESK_Y, -0.38],
+    rotation: [0, -0.22, 0],
+    scale: 1.05,
+  },
+  lamp: {
+    position: [1.35, DESK_Y, -0.55],
+    rotation: [0, -0.2, 0],
+    scale: 1.05,
+  },
+  teaCup: {
+    position: [0.58, DESK_Y, -0.55],
+    rotation: [0, -0.08, 0],
+    scale: 1,
+  },
   fillers: {
-    books: { position: [-0.95, DESK_Y, -0.05], rotation: [0, 0.4, 0], scale: 1 },
-    papers: { position: [-0.15, DESK_Y + 0.002, -0.65], rotation: [0, -0.2, 0], scale: 1 },
-    plant: { position: [-1.05, DESK_Y, -0.75], rotation: [0, 0.5, 0], scale: 1 },
-    penCup: { position: [0.22, DESK_Y, 0.08], rotation: [0, 0.1, 0], scale: 1 },
-    keyboard: { position: [0.55, DESK_Y, 0.12], rotation: [0, -0.38, 0], scale: 0.9 },
+    books: { position: [-1.0, DESK_Y, -0.35], rotation: [0, 0.25, 0], scale: 1 },
+    papers: { position: [-0.3, DESK_Y + 0.002, -0.72], rotation: [0, -0.15, 0], scale: 1 },
+    plant: { position: [-1.2, DESK_Y, -0.65], rotation: [0, 0.35, 0], scale: 1 },
+    penCup: { position: [0.55, DESK_Y, -0.28], rotation: [0, 0.08, 0], scale: 1 },
+    keyboard: { position: [0.9, DESK_Y, -0.08], rotation: [0, -0.22, 0], scale: 0.85 },
   },
 };
 
 export const CAMERA_ANCHORS = {
   projects: {
-    position: { x: 0.4, y: 0.82, z: 0.4 },
-    lookAt: { x: 0.55, y: 0.58, z: -0.2 },
+    position: { x: 0.7, y: 0.82, z: 0.25 },
+    lookAt: { x: 0.9, y: 0.58, z: -0.38 },
   },
   gallery: {
-    position: { x: 0, y: 1.05, z: 0.55 },
-    lookAt: { x: 0, y: 0.45, z: 0.12 },
+    position: { x: 0.32, y: 1.0, z: 0.35 },
+    lookAt: { x: 0.32, y: 0.48, z: -0.22 },
   },
   blog: {
-    position: { x: -0.5, y: 0.95, z: 0.5 },
-    lookAt: { x: -0.5, y: 0.48, z: 0.05 },
+    position: { x: -0.12, y: 0.92, z: 0.35 },
+    lookAt: { x: -0.12, y: 0.5, z: -0.28 },
   },
   music: {
-    position: { x: -0.72, y: 0.88, z: 0.05 },
-    lookAt: { x: -0.72, y: 0.55, z: -0.55 },
+    position: { x: -0.55, y: 0.88, z: 0.0 },
+    lookAt: { x: -0.55, y: 0.55, z: -0.55 },
   },
   experience: {
     position: { x: 0, y: 1.42, z: -0.05 },

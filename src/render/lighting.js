@@ -8,7 +8,7 @@ let lampSpot;
 let lampTarget;
 
 const WINDOW_POS = new THREE.Vector3(2.2, 2.6, -0.4);
-const DESK_AIM = new THREE.Vector3(0.2, 0.42, -0.2);
+const DESK_AIM = new THREE.Vector3(0.2, 0.44, -0.35);
 
 /**
  * Realtime PBR lighting for the desk scene.
@@ -38,7 +38,7 @@ export function createLighting(scene) {
   cam.updateProjectionMatrix();
 
   lampTarget = new THREE.Object3D();
-  lampTarget.position.set(0.4, 0.42, 0.1);
+  lampTarget.position.set(0.6, 0.44, -0.15);
   scene.add(lampTarget);
 
   lampSpot = new THREE.SpotLight(0xffc078, 7, 4.5, Math.PI / 5, 0.45, 1.4);
@@ -68,7 +68,7 @@ export function attachLampLight(lampGroup, shadeLocal = new THREE.Vector3(-0.03,
   lampSpot.angle = Math.PI / 6;
   lampSpot.penumbra = 0.55;
   if (lampTarget) {
-    lampTarget.position.set(shadeWorld.x - 0.35, 0.42, shadeWorld.z + 0.45);
+    lampTarget.position.set(shadeWorld.x - 0.35, 0.44, shadeWorld.z + 0.35);
   }
 }
 
