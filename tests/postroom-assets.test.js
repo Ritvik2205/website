@@ -1,37 +1,49 @@
-import { readFile } from 'node:fs/promises';
+import { access, readFile } from 'node:fs/promises';
 import { describe, expect, it } from 'vitest';
 
-const assets = [
-  { id: 'lamp', path: '/assets/postroom/lamp.png' },
-  { id: 'turntable', path: '/assets/postroom/turntable.png' },
-  { id: 'teacup', path: '/assets/postroom/teacup.png' },
-  { id: 'ephemera', path: '/assets/postroom/ephemera.png' },
-  { id: 'floppy', path: '/assets/postroom/floppy.png' },
+const models = [
+  'laptop.glb',
+  'lamp.glb',
+  'books.glb',
+  'plant.glb',
+  'potted-plant.glb',
+  'radio.glb',
+  'speaker.glb',
+  'keyboard.glb',
 ];
 
-describe('Monsoon Postroom placeholder assets', () => {
-  it('records the local placeholder source and ordered asset paths', async () => {
-    const manifestUrl = new URL('../public/assets/postroom/manifest.json', import.meta.url);
-    const manifest = JSON.parse(await readFile(manifestUrl, 'utf8'));
+const textures = [
+  'wood-color.jpg',
+  'wood-roughness.jpg',
+  'wood-normal.jpg',
+  'wood-ao.jpg',
+  'plaster-color.jpg',
+  'plaster-roughness.jpg',
+  'plaster-normal.jpg',
+];
 
-    expect(manifest).toEqual({
-      direction: 'monsoon-postroom',
-      source: 'local-placeholder',
-      generationCredits: 0,
-      replaceable: true,
-      assets,
-    });
+describe('Realtime PBR desk assets', () => {
+  it('documents Kenney and ambientCG attribution', async () => {
+    const attribution = await readFile(
+      new URL('../public/models/ATTRIBUTION.md', import.meta.url),
+      'utf8',
+    );
+    expect(attribution).toContain('Kenney');
+    expect(attribution).toContain('ambientCG');
+    expect(attribution).toContain('CC0');
   });
 
-  it.each(assets)('$id is a 512px transparent RGBA PNG', async ({ path }) => {
-    const assetUrl = new URL(`../public${path}`, import.meta.url);
-    const png = await readFile(assetUrl);
+  it.each(models)('%s exists under public/models', async (name) => {
+    const url = new URL(`../public/models/${name}`, import.meta.url);
+    await access(url);
+    const bytes = await readFile(url);
+    expect(bytes.byteLength).toBeGreaterThan(500);
+  });
 
-    expect(png.subarray(0, 8).toString('hex')).toBe('89504e470d0a1a0a');
-    expect(png.byteLength).toBeGreaterThan(1_000);
-    expect(png.subarray(12, 16).toString('ascii')).toBe('IHDR');
-    expect(png.readUInt32BE(16)).toBe(512);
-    expect(png.readUInt32BE(20)).toBe(512);
-    expect(png[25]).toBe(6);
+  it.each(textures)('%s exists under public/textures', async (name) => {
+    const url = new URL(`../public/textures/${name}`, import.meta.url);
+    await access(url);
+    const bytes = await readFile(url);
+    expect(bytes.byteLength).toBeGreaterThan(1_000);
   });
 });

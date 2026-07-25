@@ -1,4 +1,6 @@
 import * as THREE from 'three';
+import { loadModel, markShadowCasters, nextFrame } from '../render/loadModel.js';
+import { LAYOUT, applyPose } from './layout.js';
 
 const screenFragment = /* glsl */ `
 uniform sampler2D uTexture;
@@ -9,21 +11,39 @@ void main() {
   vec3 color = texture2D(uTexture, vUv).rgb;
   float scan = 0.9 + 0.1 * sin(vUv.y * 400.0 + uTime * 8.0);
   float flicker = 0.97 + 0.03 * sin(uTime * 47.0);
-  color *= scan * flicker * 1.4; // pushed bright so the bloom pass catches it
+  color *= scan * flicker * 1.4;
   gl_FragColor = vec4(color, 1.0);
 }
 `;
 
-export function createLaptop() {
+function createFallback(screenMaterial) {
   const group = new THREE.Group();
-  const dark = new THREE.MeshBasicMaterial({ color: 0x171b22 });
+  const dark = new THREE.MeshStandardMaterial({
+    color: 0x171b22,
+    roughness: 0.45,
+    metalness: 0.55,
+  });
 
   const base = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.02, 0.3), dark);
   base.position.y = 0.01;
+  base.castShadow = true;
+  base.receiveShadow = true;
 
   const lid = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.28, 0.015), dark.clone());
   lid.position.set(0, 0.15, -0.14);
   lid.rotation.x = -0.22;
+  lid.castShadow = true;
+
+  const screen = new THREE.Mesh(new THREE.PlaneGeometry(0.38, 0.24), screenMaterial);
+  screen.position.set(0, 0.15, -0.131);
+  screen.rotation.x = -0.22;
+
+  group.add(base, lid, screen);
+  return { group, screen };
+}
+
+export function createLaptop() {
+  const group = new THREE.Group();
 
   const cv = document.createElement('canvas');
   cv.width = 512;
@@ -60,13 +80,32 @@ export function createLaptop() {
       uTime: { value: 0 },
     },
   });
-  const screen = new THREE.Mesh(new THREE.PlaneGeometry(0.38, 0.24), screenMaterial);
-  screen.position.set(0, 0.15, -0.131);
-  screen.rotation.x = -0.22;
 
-  group.add(base, lid, screen);
-  group.position.set(1.1, 0.42, -0.15);
-  group.rotation.y = -0.35;
+  const { group: fallback, screen } = createFallback(screenMaterial);
+  group.add(fallback);
+
+  const model = loadModel('/models/laptop.glb', { height: 0.28 });
+  model.visible = false;
+  group.add(model);
+
+  const poll = () => {
+    if (model.userData.assetStatus === 'loaded') {
+      fallback.visible = false;
+      model.visible = true;
+      // Keep glowing screen as child of root so it still updates
+      screen.position.set(0, 0.16, -0.05);
+      group.add(screen);
+    } else if (model.userData.assetStatus === 'error') {
+      model.visible = false;
+      fallback.visible = true;
+    } else {
+      nextFrame(poll);
+    }
+  };
+  nextFrame(poll);
+
+  markShadowCasters(group);
+  applyPose(group, LAYOUT.laptop);
 
   return {
     group,

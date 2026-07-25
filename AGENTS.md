@@ -17,12 +17,12 @@ Run commands from this directory. The Git root is the parent `Code/` repository,
 
 - `src/main.js` is the composition root: create the engine and camera, add scene objects, register interactions, load content, register overlays, run the intro, then enter `idle`.
 - `src/core/` owns the render loop, camera rig, interaction raycasting, and mode state.
-- `src/render/` owns the baked-lighting materials, bake canvases, bloom composer, and future baked-model loader.
-- `src/scene/` owns one procedural module per desk object and the environment.
+- `src/render/` owns realtime lighting, GLB loading, bloom composer, and legacy bake helpers.
+- `src/scene/` owns one procedural/GLB module per desk object, fillers, layout poses, and the environment.
 - `src/ui/` owns the intro, overlay manager, and content-page DOM factories; associated CSS lives in `src/styles/`.
 - `src/content/` owns JSON and Markdown data plus loading and frontmatter parsing.
 
-Read the nearest child `AGENTS.md` before changing a subsystem. For changes under `src/styles/`, also follow `src/ui/AGENTS.md`. Rendering work must also follow `docs/design/2026-07-06-baked-rendering-philosophy.md`.
+Read the nearest child `AGENTS.md` before changing a subsystem. For changes under `src/styles/`, also follow `src/ui/AGENTS.md`. Rendering work must follow `docs/design/2026-07-21-realtime-pbr-rendering.md`.
 
 ## Cross-Project Rules
 

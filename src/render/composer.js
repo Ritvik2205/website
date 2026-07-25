@@ -11,11 +11,12 @@ export function createComposer(renderer, scene, camera) {
 
   composer.addPass(new RenderPass(scene, camera));
 
+  // Higher threshold / lower strength so PBR specular does not bloom the whole desk
   const bloom = new UnrealBloomPass(
     new THREE.Vector2(window.innerWidth, window.innerHeight),
-    0.4,  // strength
-    0.5,  // radius
-    0.92  // threshold — scene is full of cream paper; only true highlights bloom
+    0.28,  // strength
+    0.45,  // radius
+    0.96,  // threshold
   );
   composer.addPass(bloom);
   composer.addPass(new OutputPass());

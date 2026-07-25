@@ -70,8 +70,13 @@ const stormFragmentShader = `
   }
 `;
 
+// Deliberately larger than the 0.62 x 0.82 wall opening: the plane sits ~0.08
+// behind the wall, so an exact-size plane leaves visible void at the hole edges
+// when the camera looks through the window obliquely.
+const STORM_PLANE_SIZE = [1.0, 1.2];
+
 function createStormPlane() {
-  const geometry = new THREE.PlaneGeometry(0.62, 0.82);
+  const geometry = new THREE.PlaneGeometry(STORM_PLANE_SIZE[0], STORM_PLANE_SIZE[1]);
   const material = new THREE.ShaderMaterial({
     uniforms: {
       uTime: { value: 0 },
@@ -157,8 +162,11 @@ export function createAtmosphere({
 
   const rainLayers = [];
   if (!reduced) {
+    // The mid layer sits inside the window frame's depth slab (jambs span
+    // z -1.21..-1.17). It clears them because RAIN_X_RANGE / RAIN_Y_RANGE stay
+    // inside the 0.62 x 0.82 opening; keep that true if either range changes.
     const far = makeRainLayer({ count: 140, z: -1.22, speedScale: 0.6, opacity: 0.28, lengthScale: 0.8 });
-    const mid = makeRainLayer({ count: 90, z: -1.18, speedScale: 1, opacity: 0.45, lengthScale: 1 });
+    const mid = makeRainLayer({ count: 90, z: -1.185, speedScale: 1, opacity: 0.45, lengthScale: 1 });
     const near = makeRainLayer({ count: 40, z: -1.155, speedScale: 1.4, opacity: 0.65, lengthScale: 1.25 });
     rainLayers.push(far, mid, near);
     group.add(far.mesh, mid.mesh, near.mesh);
@@ -169,9 +177,11 @@ export function createAtmosphere({
   let flashElapsed = null; // null while idle, counts up through LIGHTNING_DURATION while flashing
 
   function update(dt) {
-    stormPlane.material.uniforms.uTime.value += dt;
-
+    // Reduced motion freezes the whole atmosphere, including the cloud drift
+    // driven by uTime and the lightning flash driver.
     if (reduced) return;
+
+    stormPlane.material.uniforms.uTime.value += dt;
 
     for (const layer of rainLayers) layer.update(dt);
 

@@ -1,6 +1,8 @@
-# Baked Rendering Philosophy
+# Baked Rendering Philosophy (Historical)
 
-Reference: [3D Cyber Desk](https://3dcyberroom.vercel.app/) by Thibault Introvigne (Awwwards honors). This doc captures how that site renders, and the rules this portfolio follows after adopting the same philosophy.
+> **Superseded for runtime (2026-07-21):** the desk scene now uses realtime PBR — see [2026-07-21-realtime-pbr-rendering.md](./2026-07-21-realtime-pbr-rendering.md). This document remains as technique reference for canvas/Blender lightmaps.
+
+Reference: [3D Cyber Desk](https://3dcyberroom.vercel.app/) by Thibault Introvigne (Awwwards honors). This doc captures how that site renders, and the bake-first rules this portfolio followed before the realtime PBR pass.
 
 ## Core principle: paint the light, don't compute it
 

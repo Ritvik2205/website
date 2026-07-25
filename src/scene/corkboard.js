@@ -1,56 +1,198 @@
 import * as THREE from 'three';
-import { createSprite } from './spriteAsset.js';
+import { markShadowCasters } from '../render/loadModel.js';
+import { LAYOUT, applyPose } from './layout.js';
+import {
+  CORK_FILLERS,
+  CORK_INTERACTIVE,
+  CORK_PIN_NODES,
+  CORK_STRINGS,
+  percentToBoardXY,
+  percentSizeToWorld,
+  resolveNodePercent,
+} from './corkboardLayout.js';
 
-const NOTES = [
-  { w: 0.28, h: 0.2,  x: -0.98, y: 0.28,  rot: -0.06, color: 0xe7dec9 },
-  { w: 0.24, h: 0.3,  x: -1.0,  y: -0.18, rot: 0.04,  color: 0x9eb7c3 },
-  { w: 0.26, h: 0.3,  x: 0.98,  y: 0.3,   rot: 0.05,  color: 0x8fa49c },
-  { w: 0.3,  h: 0.18, x: 1.02,  y: -0.2,  rot: -0.04, color: 0x9eb7c3 },
-  { w: 0.24, h: 0.16, x: -0.62, y: -0.42, rot: 0.05,  color: 0x8fa49c },
-  { w: 0.26, h: 0.17, x: 0.6,   y: -0.44, rot: -0.05, color: 0xe7dec9 },
-];
-const STRINGS = [[0, 1], [2, 3], [4, 5]];
+const PIN_MAT = new THREE.MeshStandardMaterial({
+  color: 0x2a2218,
+  roughness: 0.45,
+  metalness: 0.55,
+});
+const STRING_MAT = new THREE.LineBasicMaterial({
+  color: 0xc41e2a,
+  transparent: true,
+  opacity: 0.88,
+});
 
-function paintTitleCanvas(cv) {
-  const g = cv.getContext('2d');
-  g.fillStyle = '#e7dec9';
-  g.fillRect(0, 0, 1024, 640);
-
-  // Rag Paper route ledger with restrained baked-in handling marks.
-  const grad = g.createLinearGradient(0, 640, 500, 200);
-  grad.addColorStop(0, 'rgba(118, 81, 55, 0.22)');
-  grad.addColorStop(1, 'rgba(118, 81, 55, 0)');
-  g.fillStyle = grad;
-  g.fillRect(0, 0, 1024, 640);
-
-  g.fillStyle = '#171b22';
-  g.textAlign = 'center';
-  g.font = '700 76px "Space Mono", monospace';
-  g.fillText('MONSOON / POSTROOM', 512, 180);
-  g.fillStyle = '#688178';
-  g.fillRect(138, 228, 748, 8);
-  g.fillStyle = '#493b35';
-  g.font = '600 128px Caveat, cursive';
-  g.fillText('Ritvik Gupta', 512, 430);
+function hashSeed(str) {
+  let h = 2166136261;
+  for (let i = 0; i < str.length; i++) {
+    h ^= str.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return h >>> 0;
 }
 
-function makeTitleTexture() {
+function makePhotoTexture(seed, kind) {
   const cv = document.createElement('canvas');
-  cv.width = 1024;
-  cv.height = 640;
-  paintTitleCanvas(cv);
+  cv.width = 128;
+  cv.height = 160;
+  const g = cv.getContext('2d');
+  const rnd = (() => {
+    let s = seed || 1;
+    return () => {
+      s = (s * 1664525 + 1013904223) >>> 0;
+      return s / 0xffffffff;
+    };
+  })();
 
-  const texture = new THREE.CanvasTexture(cv);
-  const fontsReady = document.fonts?.ready;
-  if (fontsReady) {
-    Promise.resolve(fontsReady)
-      .then(() => {
-        paintTitleCanvas(cv);
-        texture.needsUpdate = true;
-      })
-      .catch(() => {});
+  // Warm cork peeking for scraps; B&W photo for polaroids
+  if (kind === 'scrap') {
+    g.fillStyle = `hsl(${30 + rnd() * 20}, 18%, ${55 + rnd() * 20}%)`;
+    g.fillRect(0, 0, 128, 160);
+    g.fillStyle = 'rgba(40,30,20,0.35)';
+    for (let i = 0; i < 40; i++) {
+      g.fillRect(rnd() * 128, rnd() * 160, 2 + rnd() * 10, 1 + rnd() * 3);
+    }
+  } else {
+    const base = 30 + rnd() * 40;
+    g.fillStyle = `rgb(${base},${base},${base + 8})`;
+    g.fillRect(0, 0, 128, 160);
+    // Soft vignette figure / architecture blobs
+    for (let i = 0; i < 5; i++) {
+      const gx = 20 + rnd() * 90;
+      const gy = 20 + rnd() * 110;
+      const gr = g.createRadialGradient(gx, gy, 4, gx, gy, 20 + rnd() * 40);
+      const c = 20 + rnd() * 90;
+      gr.addColorStop(0, `rgba(${c},${c},${c},0.9)`);
+      gr.addColorStop(1, 'rgba(20,20,24,0)');
+      g.fillStyle = gr;
+      g.fillRect(0, 0, 128, 160);
+    }
+    // Film grain
+    const img = g.getImageData(0, 0, 128, 160);
+    for (let i = 0; i < img.data.length; i += 4) {
+      const n = (rnd() - 0.5) * 28;
+      img.data[i] = Math.max(0, Math.min(255, img.data[i] + n));
+      img.data[i + 1] = Math.max(0, Math.min(255, img.data[i + 1] + n));
+      img.data[i + 2] = Math.max(0, Math.min(255, img.data[i + 2] + n));
+    }
+    g.putImageData(img, 0, 0);
   }
-  return texture;
+
+  const tex = new THREE.CanvasTexture(cv);
+  tex.colorSpace = THREE.SRGBColorSpace;
+  return tex;
+}
+
+function makePolaroidMesh({ id, kind, left, top, w, h, rot }, z) {
+  const size = percentSizeToWorld(w, h);
+  const { x, y } = percentToBoardXY(left + w / 2, top + h / 2);
+  const group = new THREE.Group();
+  group.position.set(x, y, z);
+  group.rotation.z = (rot * Math.PI) / 180;
+
+  const border = kind === 'scrap' ? 0.01 : 0.018;
+  const frame = new THREE.Mesh(
+    new THREE.PlaneGeometry(size.w, size.h),
+    new THREE.MeshStandardMaterial({
+      color: kind === 'scrap' ? 0xd8cfc0 : 0xf2efe8,
+      roughness: 0.88,
+      metalness: 0,
+      side: THREE.DoubleSide,
+    }),
+  );
+  frame.castShadow = true;
+  group.add(frame);
+
+  const photoW = size.w - border * 2;
+  const photoH = kind === 'polaroid' ? size.h - border * 2.6 : size.h - border * 2;
+  const photo = new THREE.Mesh(
+    new THREE.PlaneGeometry(photoW, photoH),
+    new THREE.MeshStandardMaterial({
+      map: makePhotoTexture(hashSeed(id), kind),
+      roughness: 0.75,
+      metalness: 0,
+      side: THREE.DoubleSide,
+    }),
+  );
+  photo.position.z = 0.002;
+  photo.position.y = kind === 'polaroid' ? border * 0.35 : 0;
+  photo.castShadow = true;
+  group.add(photo);
+
+  const pin = new THREE.Mesh(new THREE.SphereGeometry(0.012, 10, 8), PIN_MAT);
+  pin.position.set(0, size.h / 2 - 0.018, 0.012);
+  pin.castShadow = true;
+  group.add(pin);
+
+  return group;
+}
+
+function makeInteractiveMesh(item, z) {
+  const size = percentSizeToWorld(item.w, item.h);
+  const { x, y } = percentToBoardXY(item.left + item.w / 2, item.top + item.h / 2);
+  const group = new THREE.Group();
+  group.position.set(x, y, z);
+  group.rotation.z = (item.rot * Math.PI) / 180;
+  group.userData.interactiveNote = item.id;
+
+  let color = 0xe7dec9;
+  if (item.kind === 'ruled') color = 0x9eb7c3;
+  if (item.kind === 'polaroid') color = 0x8fa49c;
+
+  const card = new THREE.Mesh(
+    new THREE.PlaneGeometry(size.w, size.h),
+    new THREE.MeshStandardMaterial({ color, roughness: 0.9, side: THREE.DoubleSide }),
+  );
+  card.castShadow = true;
+  group.add(card);
+
+  if (item.kind === 'polaroid') {
+    const inset = new THREE.Mesh(
+      new THREE.PlaneGeometry(size.w * 0.82, size.h * 0.62),
+      new THREE.MeshStandardMaterial({
+        map: makePhotoTexture(hashSeed(item.id), 'polaroid'),
+        roughness: 0.7,
+        side: THREE.DoubleSide,
+      }),
+    );
+    inset.position.set(0, size.h * 0.08, 0.003);
+    group.add(inset);
+  }
+
+  const pin = new THREE.Mesh(new THREE.SphereGeometry(0.013, 10, 8), PIN_MAT);
+  pin.position.set(0, size.h / 2 - 0.016, 0.012);
+  pin.castShadow = true;
+  group.add(pin);
+
+  return group;
+}
+
+function addPinNode(node, z, group) {
+  const { x, y } = percentToBoardXY(node.left, node.top);
+  const pin = new THREE.Mesh(new THREE.SphereGeometry(0.011, 10, 8), PIN_MAT);
+  pin.position.set(x, y, z);
+  pin.castShadow = true;
+  group.add(pin);
+}
+
+function addString(aKey, bKey, group) {
+  const a = resolveNodePercent(aKey);
+  const b = resolveNodePercent(bKey);
+  if (!a || !b) return;
+  const pa = percentToBoardXY(a.left, a.top);
+  const pb = percentToBoardXY(b.left, b.top);
+  const mid = new THREE.Vector3(
+    (pa.x + pb.x) / 2,
+    (pa.y + pb.y) / 2 - 0.04 - Math.abs(pb.x - pa.x) * 0.04,
+    0.055,
+  );
+  const curve = new THREE.CatmullRomCurve3([
+    new THREE.Vector3(pa.x, pa.y, 0.05),
+    mid,
+    new THREE.Vector3(pb.x, pb.y, 0.05),
+  ]);
+  const geom = new THREE.BufferGeometry().setFromPoints(curve.getPoints(16));
+  group.add(new THREE.Line(geom, STRING_MAT));
 }
 
 export function createCorkboard() {
@@ -58,79 +200,49 @@ export function createCorkboard() {
 
   const board = new THREE.Mesh(
     new THREE.BoxGeometry(2.7, 1.3, 0.04),
-    new THREE.MeshBasicMaterial({ color: 0x8a6948 })
+    new THREE.MeshStandardMaterial({ color: 0x8a6948, roughness: 0.92, metalness: 0.0 }),
   );
+  board.castShadow = true;
+  board.receiveShadow = true;
 
-  const frameMat = new THREE.MeshBasicMaterial({ color: 0x604127 });
+  const frameMat = new THREE.MeshStandardMaterial({ color: 0x604127, roughness: 0.7, metalness: 0.05 });
   const frameTop = new THREE.Mesh(new THREE.BoxGeometry(2.86, 0.09, 0.07), frameMat);
   frameTop.position.set(0, 0.695, 0.005);
+  frameTop.castShadow = true;
   const frameBottom = frameTop.clone();
   frameBottom.position.y = -0.695;
   const frameLeft = new THREE.Mesh(new THREE.BoxGeometry(0.09, 1.48, 0.07), frameMat);
   frameLeft.position.set(-1.385, 0, 0.005);
+  frameLeft.castShadow = true;
   const frameRight = frameLeft.clone();
   frameRight.position.x = 1.385;
   group.add(board, frameTop, frameBottom, frameLeft, frameRight);
 
-  const ephemeraHeight = 1.1;
-  const ephemera = createSprite('/assets/postroom/ephemera.png', {
-    height: ephemeraHeight,
+  // Dense decorative layer
+  CORK_FILLERS.forEach((item, i) => {
+    group.add(makePolaroidMesh(item, 0.028 + (i % 5) * 0.0015));
   });
-  ephemera.position.set(0, -ephemeraHeight / 2, 0.02);
-  group.add(ephemera);
 
-  // Central Rag Paper route ledger.
-  const title = new THREE.Mesh(
-    new THREE.PlaneGeometry(1.24, 0.78),
-    new THREE.MeshBasicMaterial({ map: makeTitleTexture() })
-  );
-  title.position.set(0, 0.02, 0.028);
-  title.rotation.z = 0.012;
-  group.add(title);
-  for (const [px, py] of [[-0.56, 0.36], [0.57, 0.37], [-0.57, -0.33], [0.56, -0.34]]) {
-    const tack = new THREE.Mesh(
-      new THREE.SphereGeometry(0.014, 12, 8),
-      new THREE.MeshBasicMaterial({ color: 0xa77a3f })
-    );
-    tack.position.set(px, py, 0.04);
-    group.add(tack);
-  }
-
-  const pinPositions = [];
-  for (const n of NOTES) {
-    const note = new THREE.Mesh(
-      new THREE.PlaneGeometry(n.w, n.h),
-      new THREE.MeshBasicMaterial({ color: n.color })
-    );
-    note.position.set(n.x, n.y, 0.028);
-    note.rotation.z = n.rot;
-    group.add(note);
-
-    const pin = new THREE.Mesh(
-      new THREE.SphereGeometry(0.013, 12, 8),
-      new THREE.MeshBasicMaterial({ color: 0xa77a3f })
-    );
-    pin.position.set(n.x, n.y + n.h / 2 - 0.012, 0.042);
-    group.add(pin);
-    pinPositions.push(pin.position.clone());
-  }
-
-  const stringMat = new THREE.LineBasicMaterial({
-    color: 0x688178,
-    transparent: true,
-    opacity: 0.72,
+  // Clickable experience cards (visual only in 3D — click opens overlay)
+  CORK_INTERACTIVE.forEach((item, i) => {
+    group.add(makeInteractiveMesh(item, 0.036 + i * 0.001));
   });
-  for (const [a, b] of STRINGS) {
-    const pa = pinPositions[a];
-    const pb = pinPositions[b];
-    const mid = pa.clone().lerp(pb, 0.5);
-    mid.y -= 0.07;
-    mid.z += 0.008;
-    const curve = new THREE.CatmullRomCurve3([pa, mid, pb]);
-    const geom = new THREE.BufferGeometry().setFromPoints(curve.getPoints(20));
-    group.add(new THREE.Line(geom, stringMat));
+
+  CORK_PIN_NODES.forEach((node) => addPinNode(node, 0.048, group));
+
+  for (const [a, b] of CORK_STRINGS) {
+    addString(a, b, group);
   }
 
-  group.position.set(0, 1.42, -1.17);
-  return { group, id: 'experience', label: 'the board' };
+  markShadowCasters(group);
+  applyPose(group, LAYOUT.corkboard);
+
+  return {
+    group,
+    id: 'experience',
+    label: 'the board',
+    // Wall-mounted: no warm tint / lift on hover
+    skipHoverVisual: true,
+    skipHoverLift: true,
+  };
 }

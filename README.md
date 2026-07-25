@@ -28,10 +28,10 @@ Images: drop files into `public/` (e.g. `public/art/…`) and point the JSON `sr
 ## Architecture
 
 - `src/core/` — renderer/loop (`engine.js`), mode state machine (`state.js`), camera parallax + fly-to (`cameraRig.js`), raycast hover/click (`interactions.js`)
-- `src/render/` — **baked rendering pipeline** (see `docs/design/2026-07-06-baked-rendering-philosophy.md`): no scene lights; light/shadow/AO painted into canvas "bakes" (`bakeCanvas.js`) shown through a day/night mix shader (`bakedMaterial.js`); glow = bright pixels + UnrealBloom (`composer.js`); `bakedModel.js` is the drop-in loader for future Blender-baked GLB + lightmap pairs
-- `src/scene/` — one module per desk object, each exporting `{ group, id, label }`; all materials unlit (`MeshBasicMaterial` / shaders)
+- `src/render/` — **realtime PBR lighting** (see `docs/design/2026-07-21-realtime-pbr-rendering.md`): window `DirectionalLight` + shadows, hemisphere fill, lamp `SpotLight`, GLB loader (`loadModel.js`), bloom composer; legacy bake helpers remain for transitional sprites
+- `src/scene/` — one module per desk object + `layout.js` poses + `fillers.js` clutter; `MeshStandardMaterial` / screen shaders / Kenney GLBs
 - `src/ui/` — overlay manager, intro sequence, one module per content page
 - Content pages are DOM overlays; 3D rendering pauses while one is open
-- Lamp click tweens the global `nightMix` — the entire room crossfades between warm-day and cool-dusk bakes
+- Lamp click tweens `lampMood` — warm lamp-dominant ↔ cool window-dominant
 
 Design docs: `docs/design/` + `docs/superpowers/specs/`, plans: `docs/superpowers/plans/`.
