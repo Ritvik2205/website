@@ -4,7 +4,7 @@ const RAIN_X_RANGE = [1.92, 2.48];
 const RAIN_Y_RANGE = [1.4, 2.2];
 const RAIN_DRIFT_RANGE = [-0.025, -0.01];
 const LIGHTNING_DURATION = 0.35;
-const DEFAULT_BASE_EMISSIVE = 1.15;
+const DEFAULT_BASE_EMISSIVE = 0.35;
 
 // Piecewise-linear double-flash envelope: rise → peak → dip → second (softer)
 // peak → fade to 0, sampled across the flash's [0, 1] progress fraction.
@@ -41,32 +41,31 @@ const stormVertexShader = `
   }
 `;
 
+// Samples Poly Haven "Approaching Storm" (CC0) with a slow pan + deep-blue grade.
 const stormFragmentShader = `
+  uniform sampler2D uSky;
   uniform float uTime;
   uniform float uFlash;
   varying vec2 vUv;
 
-  float hash(vec2 p) {
-    return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
-  }
-
-  float noise(vec2 p) {
-    vec2 i = floor(p);
-    vec2 f = fract(p);
-    vec2 u = f * f * (3.0 - 2.0 * f);
-    float a = hash(i);
-    float b = hash(i + vec2(1.0, 0.0));
-    float c = hash(i + vec2(0.0, 1.0));
-    float d = hash(i + vec2(1.0, 1.0));
-    return mix(mix(a, b, u.x), mix(c, d, u.x), u.y);
-  }
-
   void main() {
-    vec2 drift = vec2(uTime * 0.015, uTime * 0.01);
-    float clouds = noise(vUv * 3.5 + drift) * 0.6 + noise(vUv * 7.0 - drift) * 0.4;
-    vec3 base = mix(vec3(0.11, 0.15, 0.21), vec3(0.27, 0.33, 0.41), clouds);
-    vec3 flash = vec3(0.75, 0.85, 1.0) * uFlash;
-    gl_FragColor = vec4(base + flash, 0.85);
+    // Equirectangular sky: crop an upper storm band and drift horizontally.
+    vec2 uv = vec2(
+      fract(vUv.x * 0.42 + uTime * 0.006),
+      mix(0.52, 0.88, vUv.y)
+    );
+    vec3 sky = texture2D(uSky, uv).rgb;
+
+    float lum = dot(sky, vec3(0.299, 0.587, 0.114));
+    vec3 deepBlue = vec3(0.03, 0.06, 0.14);
+    vec3 greyCloud = vec3(0.28, 0.31, 0.36);
+    vec3 graded = mix(deepBlue, greyCloud, smoothstep(0.05, 0.5, lum));
+    // Keep some photo detail from the HDRI plate.
+    graded = mix(graded, sky * vec3(0.45, 0.55, 0.85), 0.4);
+    graded *= 0.72;
+
+    vec3 flash = vec3(0.82, 0.88, 1.0) * uFlash;
+    gl_FragColor = vec4(graded + flash, 1.0);
   }
 `;
 
@@ -75,20 +74,34 @@ const stormFragmentShader = `
 // when the camera looks through the window obliquely.
 const STORM_PLANE_SIZE = [1.0, 1.2];
 
+function loadStormSkyMap() {
+  if (typeof document === 'undefined') {
+    const map = new THREE.Texture();
+    map.colorSpace = THREE.SRGBColorSpace;
+    return map;
+  }
+  const map = new THREE.TextureLoader().load('/textures/storm-sky.jpg');
+  map.colorSpace = THREE.SRGBColorSpace;
+  map.wrapS = THREE.RepeatWrapping;
+  map.wrapT = THREE.ClampToEdgeWrapping;
+  return map;
+}
+
 function createStormPlane() {
   const geometry = new THREE.PlaneGeometry(STORM_PLANE_SIZE[0], STORM_PLANE_SIZE[1]);
   const material = new THREE.ShaderMaterial({
     uniforms: {
+      uSky: { value: loadStormSkyMap() },
       uTime: { value: 0 },
       uFlash: { value: 0 },
     },
     vertexShader: stormVertexShader,
     fragmentShader: stormFragmentShader,
-    transparent: true,
     depthWrite: false,
   });
   const mesh = new THREE.Mesh(geometry, material);
   mesh.position.set(2.2, 1.8, -1.28);
+  mesh.name = 'stormPlane';
   return mesh;
 }
 
@@ -116,7 +129,7 @@ function makeRainLayer({ count, z, speedScale = 1, opacity = 0.5, lengthScale = 
   const geometry = new THREE.BufferGeometry();
   geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
   const material = new THREE.LineBasicMaterial({
-    color: 0x8aa8c0,
+    color: 0x7a8aa0,
     transparent: true,
     opacity,
   });
@@ -144,7 +157,7 @@ function makeRainLayer({ count, z, speedScale = 1, opacity = 0.5, lengthScale = 
 }
 
 /**
- * Cinematic window weather: a slow cloud-noise storm plane behind the glass,
+ * Cinematic window weather: textured storm sky behind the glass,
  * three parallax rain layers, and a periodic double-flash lightning driver
  * that composes with the realtime lighting mood via `applyWindowFlashLevel`.
  */
@@ -201,7 +214,7 @@ export function createAtmosphere({
     if (windowPane?.material) {
       const moodT = THREE.MathUtils.clamp((getLampMood() - 0.15) / 0.85, 0, 1);
       windowPane.material.emissiveIntensity = envelope > 0
-        ? baseEmissive + envelope * THREE.MathUtils.lerp(1.6, 0.5, moodT)
+        ? baseEmissive + envelope * THREE.MathUtils.lerp(1.4, 0.45, moodT)
         : baseEmissive;
     }
 

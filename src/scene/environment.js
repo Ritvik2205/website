@@ -174,13 +174,13 @@ export function createEnvironment() {
   const windowPane = new THREE.Mesh(
     new THREE.PlaneGeometry(0.6, 0.8),
     new THREE.MeshStandardMaterial({
-      color: 0x8aa8b8,
-      emissive: 0xa8c8dc,
-      emissiveIntensity: 1.15,
-      roughness: 0.06,
-      metalness: 0.18,
+      color: 0x152030,
+      emissive: 0x1e3048,
+      emissiveIntensity: 0.35,
+      roughness: 0.08,
+      metalness: 0.12,
       transparent: true,
-      opacity: 0.92,
+      opacity: 0.32,
     }),
   );
   windowPane.name = 'windowPane';

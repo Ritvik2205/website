@@ -15,7 +15,8 @@ describe('createEnvironment window pane', () => {
     expect(env.windowPane.isMesh).toBe(true);
     expect(env.windowPane.material.roughness).toBeLessThan(0.12);
     expect(env.windowPane.material.metalness).toBeGreaterThan(0.08);
-    expect(env.windowPane.material.emissiveIntensity).toBeGreaterThan(0.5);
+    expect(env.windowPane.material.emissiveIntensity).toBeGreaterThan(0.2);
+    expect(env.windowPane.material.opacity).toBeLessThan(0.5);
   });
 
   it('builds a hollow window frame that leaves the wall opening clear', () => {
@@ -54,6 +55,7 @@ describe('createAtmosphere cinematic storm', () => {
     });
     expect(lines.length).toBeGreaterThanOrEqual(3);
     expect(stormPlane).toBeTruthy();
+    expect(stormPlane.material.uniforms.uSky).toBeTruthy();
 
     // Overscans the 0.62 x 0.82 wall opening so oblique views through the
     // window never reveal void past the storm plane's edges.
@@ -66,7 +68,7 @@ describe('createAtmosphere cinematic storm', () => {
   it('drives applyWindowFlashLevel during a forced lightning update', () => {
     const levels = [];
     const pane = {
-      material: { emissiveIntensity: 1.15 },
+      material: { emissiveIntensity: 0.35 },
     };
     const { update } = createAtmosphere({
       reduced: false,

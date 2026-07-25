@@ -9,6 +9,12 @@ All third-party assets below are used under their stated licenses. Paths are rel
 | `textures/wood-*.jpg` | [WoodFloor051](https://ambientcg.com/view?id=WoodFloor051) 1K JPG | CC0 |
 | `textures/plaster-*.jpg` | [Plaster001](https://ambientcg.com/view?id=Plaster001) 1K JPG | CC0 |
 
+## Sky (Poly Haven — CC0)
+
+| File | Source | License |
+|------|--------|---------|
+| `textures/storm-sky.jpg` | [Approaching Storm](https://polyhaven.com/a/approaching_storm) tonemapped JPG, resized to 2048×1024 | CC0 |
+
 ## Models (Kenney Furniture Kit — CC0)
 
 Source pack: [Kenney Furniture Kit](https://kenney.nl/assets/furniture-kit) (CC0 1.0).
@@ -24,4 +30,4 @@ Source pack: [Kenney Furniture Kit](https://kenney.nl/assets/furniture-kit) (CC0
 | `models/speaker.glb` | `speakerSmall.glb` |
 | `models/keyboard.glb` | `computerKeyboard.glb` |
 
-Credit to Kenney is appreciated but not required under CC0.
+Credit to Kenney / Poly Haven / ambientCG is appreciated but not required under CC0.

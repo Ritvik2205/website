@@ -20,6 +20,7 @@ const textures = [
   'plaster-color.jpg',
   'plaster-roughness.jpg',
   'plaster-normal.jpg',
+  'storm-sky.jpg',
 ];
 
 describe('Realtime PBR desk assets', () => {
@@ -30,6 +31,7 @@ describe('Realtime PBR desk assets', () => {
     );
     expect(attribution).toContain('Kenney');
     expect(attribution).toContain('ambientCG');
+    expect(attribution).toContain('Poly Haven');
     expect(attribution).toContain('CC0');
   });
 
