@@ -41,7 +41,7 @@ export function createLighting(scene) {
   lampTarget.position.set(0.4, 0.42, 0.1);
   scene.add(lampTarget);
 
-  lampSpot = new THREE.SpotLight(0xffc078, 18, 4.5, Math.PI / 5, 0.45, 1.4);
+  lampSpot = new THREE.SpotLight(0xffc078, 7, 4.5, Math.PI / 5, 0.45, 1.4);
   lampSpot.position.set(1.45, 0.95, -0.45);
   lampSpot.target = lampTarget;
   lampSpot.castShadow = true;
@@ -59,8 +59,8 @@ export function createLighting(scene) {
   };
 }
 
-/** Position the spot inside the lamp shade (shade-local offset) and aim at the desk. */
-export function attachLampLight(lampGroup, shadeLocal = new THREE.Vector3(-0.03, 0.48, 0.02)) {
+/** Position the spot inside/behind the lamp shade and aim at the desk. */
+export function attachLampLight(lampGroup, shadeLocal = new THREE.Vector3(-0.03, 0.48, -0.04)) {
   if (!lampSpot || !lampGroup) return;
   const shadeWorld = shadeLocal.clone();
   lampGroup.localToWorld(shadeWorld);
@@ -77,7 +77,7 @@ function applyMood(t) {
   const warm = THREE.MathUtils.clamp(t, 0.15, 1);
   const cool = 1 - (warm - 0.15) / 0.85;
 
-  lampSpot.intensity = THREE.MathUtils.lerp(0.4, 18, (warm - 0.15) / 0.85);
+  lampSpot.intensity = THREE.MathUtils.lerp(0.4, 7, (warm - 0.15) / 0.85);
   lampSpot.color.setHex(warm > 0.5 ? 0xffc078 : 0xe8a858);
 
   windowLight.intensity = THREE.MathUtils.lerp(0.85, 1.55, cool);

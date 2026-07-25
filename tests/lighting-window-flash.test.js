@@ -32,4 +32,12 @@ describe('window flash API', () => {
     expect(windowLight.intensity).toBeGreaterThan(dimBaseline);
     applyWindowFlashLevel(0);
   });
+
+  it('caps warm lamp spot intensity near 7', () => {
+    const scene = new THREE.Scene();
+    const { lampSpot } = createLighting(scene);
+    setLampMood(1);
+    expect(lampSpot.intensity).toBeLessThanOrEqual(7.5);
+    expect(lampSpot.intensity).toBeGreaterThan(5);
+  });
 });

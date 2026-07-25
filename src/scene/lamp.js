@@ -61,7 +61,7 @@ export function createLamp() {
     opacity: 0.95,
   });
   const glow = new THREE.Mesh(new THREE.PlaneGeometry(0.2, 0.2), glowMaterial);
-  glow.position.set(-0.03, 0.48, 0.02);
+  glow.position.set(-0.03, 0.48, -0.04);
   glow.scale.setScalar(0.85);
   group.add(glow);
 
@@ -69,8 +69,8 @@ export function createLamp() {
     if (model.userData.assetStatus === 'loaded') {
       fallback.visible = false;
       model.visible = true;
-      // Shade-local offset for the lamp.glb asset's cavity.
-      const shadeLocal = new THREE.Vector3(0, 0.42, 0.02);
+      // Shade-local offset behind the lamp.glb shade opening.
+      const shadeLocal = new THREE.Vector3(0, 0.42, -0.04);
       glow.position.copy(shadeLocal);
       attachLampLight(group, shadeLocal);
     } else if (model.userData.assetStatus === 'error') {
