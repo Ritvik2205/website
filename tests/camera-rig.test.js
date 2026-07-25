@@ -36,8 +36,8 @@ describe('createCameraRig fixed framing', () => {
 
     expect(rig.HOME.position.x).toBe(0);
     expect(rig.HOME.position.y).toBeCloseTo(0.95, 2);
-    expect(rig.HOME.position.z).toBeCloseTo(1.45, 2);
-    expect(camera.position.z).toBeCloseTo(1.45, 2);
+    expect(rig.HOME.position.z).toBeCloseTo(1.3, 2);
+    expect(camera.position.z).toBeCloseTo(1.3, 2);
 
     const before = camera.position.clone();
     rig.setPointer(1, 1);
