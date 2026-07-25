@@ -174,8 +174,8 @@ describe('Monsoon Postroom remaining procedural props', () => {
     expect(base.geometry.parameters).toMatchObject({ width: 0.42, height: 0.02, depth: 0.3 });
     expect(lid.geometry.parameters).toMatchObject({ width: 0.42, height: 0.28, depth: 0.015 });
     expect(screen.geometry.parameters).toMatchObject({ width: 0.38, height: 0.24 });
-    expect(laptop.group.position).toMatchObject({ x: 0.9, y: 0.44, z: -0.38 });
-    expect(laptop.group.rotation.y).toBeCloseTo(-0.22);
+    expect(laptop.group.position).toMatchObject({ x: 0.72, y: 0.44, z: -0.38 });
+    expect(laptop.group.rotation.y).toBeCloseTo(-0.18);
     expect(base.material.color.getHex()).toBe(0x171b22);
     expect(lid.material.color.getHex()).toBe(0x171b22);
     expect(draws).toEqual(expect.arrayContaining([
@@ -215,8 +215,8 @@ describe('Monsoon Postroom remaining procedural props', () => {
     expect(spine.geometry.parameters).toMatchObject({ width: 0.03, height: 0.055, depth: 0.3 });
     expect(pages.geometry.parameters).toMatchObject({ width: 0.2, height: 0.035, depth: 0.28 });
     expect(strap.geometry.parameters).toMatchObject({ width: 0.24, height: 0.012, depth: 0.03 });
-    expect(group.position).toMatchObject({ x: -0.12, y: 0.44, z: -0.28 });
-    expect(group.rotation.y).toBeCloseTo(0.14);
+    expect(group.position).toMatchObject({ x: -0.05, y: 0.44, z: -0.28 });
+    expect(group.rotation.y).toBeCloseTo(0.12);
     expect(cover.material.color.getHex()).toBe(0x765137);
     expect(pages.material.color.getHex()).toBe(0xe7dec9);
     expect(canvases[0].draws).toEqual(expect.arrayContaining([
@@ -252,7 +252,7 @@ describe('Monsoon Postroom remaining procedural props', () => {
         && geometry.parameters.height === 0.14
         && geometry.parameters.radialSegments === 10
     ))).toBe(true);
-    expect(group.position).toMatchObject({ x: 0.32, y: 0.44, z: -0.22 });
+    expect(group.position).toMatchObject({ x: 0.28, y: 0.44, z: -0.22 });
     expect(group.rotation.y).toBeCloseTo(0.02);
     expect(pages.every(({ material }) => material.color.getHex() === 0xe7dec9)).toBe(true);
     expect(canvases[0].draws).toEqual(expect.arrayContaining([

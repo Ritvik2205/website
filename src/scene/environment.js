@@ -60,7 +60,7 @@ export function createEnvironment() {
   const wallMat = plasterMaterial();
 
   const deskBody = new THREE.Mesh(
-    new THREE.BoxGeometry(4.4, 0.09, 1.05),
+    new THREE.BoxGeometry(3.0, 0.09, 1.05),
     deskMat,
   );
   deskBody.position.set(0, 0.375, -0.675);
@@ -69,7 +69,7 @@ export function createEnvironment() {
   group.add(deskBody);
 
   const deskTop = new THREE.Mesh(
-    new THREE.BoxGeometry(4.4, 0.04, 1.05),
+    new THREE.BoxGeometry(3.0, 0.04, 1.05),
     deskMat,
   );
   // Centered so the top face sits at y = 0.44 (matches LAYOUT.deskY)
@@ -82,7 +82,7 @@ export function createEnvironment() {
   group.add(deskTop);
 
   const deskEdge = new THREE.Mesh(
-    new THREE.BoxGeometry(4.4, 0.18, 0.07),
+    new THREE.BoxGeometry(3.0, 0.18, 0.07),
     edgeMat,
   );
   deskEdge.position.set(0, 0.33, -0.15);

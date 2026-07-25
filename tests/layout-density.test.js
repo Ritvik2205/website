@@ -7,8 +7,8 @@ const readSource = (path) => readFile(new URL(path, import.meta.url), 'utf8');
 describe('desk density', () => {
   it('uses a shallow desk depth in environment geometry', async () => {
     const source = await readSource('../src/scene/environment.js');
-    expect(source).toMatch(/BoxGeometry\(\s*4\.4,\s*0\.09,\s*1\.05\s*\)/);
-    expect(source).toMatch(/BoxGeometry\(\s*4\.4,\s*0\.04,\s*1\.05\s*\)/);
+    expect(source).toMatch(/BoxGeometry\(\s*3\.0,\s*0\.09,\s*1\.05\s*\)/);
+    expect(source).toMatch(/BoxGeometry\(\s*3\.0,\s*0\.04,\s*1\.05\s*\)/);
   });
 
   it('seats props on the desk top surface', () => {
