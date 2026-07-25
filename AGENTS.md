@@ -30,7 +30,7 @@ Read the nearest child `AGENTS.md` before changing a subsystem. For changes unde
 - Content pages are DOM overlays. Pause 3D rendering only after an overlay opens and resume before it closes.
 - Keep user-visible portfolio content in `src/content/`; pass loaded data into UI factories instead of hardcoding copy.
 - Keep `.js` extensions on local ES-module imports.
-- Preserve `prefers-reduced-motion` behavior for camera movement, parallax, and atmosphere.
+- Preserve `prefers-reduced-motion` behavior for camera fly-ins, intro, and atmosphere. Idle camera framing is fixed (no cursor parallax).
 - Use GSAP for coordinated transitions and the engine tick for per-frame scene updates; do not create competing animation loops.
 - Avoid unrelated refactors. The procedural scene is intentionally replaceable by future baked GLB assets.
 

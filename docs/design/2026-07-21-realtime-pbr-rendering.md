@@ -15,7 +15,7 @@ Light the scene at runtime. Window light is a shadowed `DirectionalLight`; the l
 3. **One mood axis** — `lampMood` ∈ `[0.15, 1]` via `setLampMood` / `getLampMood`. Lamp click GSAP-tweens it.
 4. **Shadows** — `renderer.shadowMap.enabled` with `PCFSoftShadowMap`; directional map 2048; desk receives; props cast.
 5. **Glow** — bright emissive pixels (window pane, laptop screen) + retuned `UnrealBloomPass`.
-6. **Directed camera** — fov 50, parallax, GSAP fly-to; no orbit.
+6. **Directed camera** — fov 50, fixed home pose, GSAP fly-to; no orbit / no idle parallax.
 7. **GLB drop-in** — `loadModel()` from `public/models/`; procedural Standard fallbacks if load fails.
 
 ## Asset licensing
