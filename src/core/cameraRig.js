@@ -2,8 +2,8 @@ import * as THREE from 'three';
 import gsap from 'gsap';
 
 const HOME = {
-  position: new THREE.Vector3(0, 0.95, 1.45),
-  lookAt: new THREE.Vector3(0, 0.72, -1.0),
+  position: new THREE.Vector3(0, 0.95, 1.3),
+  lookAt: new THREE.Vector3(0, 0.95, -1.0),
 };
 
 export function createCameraRig(camera) {
