@@ -5,25 +5,37 @@ import { LAYOUT, applyPose } from './layout.js';
 function createFallback() {
   const group = new THREE.Group();
   const plinth = new THREE.Mesh(
-    new THREE.BoxGeometry(0.58, 0.09, 0.34),
+    new THREE.BoxGeometry(0.42, 0.06, 0.36),
     new THREE.MeshStandardMaterial({ color: 0x5b3526, roughness: 0.7, metalness: 0.1 }),
   );
-  plinth.position.y = 0.045;
+  plinth.position.y = 0.03;
   plinth.castShadow = true;
   plinth.receiveShadow = true;
+
+  const platterGroup = new THREE.Group();
+  platterGroup.position.set(-0.04, 0.075, 0);
   const platter = new THREE.Mesh(
-    new THREE.CylinderGeometry(0.14, 0.14, 0.025, 48),
-    new THREE.MeshStandardMaterial({ color: 0x25282b, roughness: 0.35, metalness: 0.45 }),
+    new THREE.CylinderGeometry(0.13, 0.13, 0.018, 48),
+    new THREE.MeshStandardMaterial({ color: 0x1a1c1e, roughness: 0.4, metalness: 0.35 }),
   );
-  platter.position.set(-0.08, 0.1025, 0);
   platter.castShadow = true;
-  const control = new THREE.Mesh(
-    new THREE.CylinderGeometry(0.025, 0.025, 0.025, 16),
-    new THREE.MeshStandardMaterial({ color: 0xa77a3f, roughness: 0.4, metalness: 0.5 }),
+  const label = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.035, 0.035, 0.02, 24),
+    new THREE.MeshStandardMaterial({ color: 0xc44444, roughness: 0.55, metalness: 0.1 }),
   );
-  control.position.set(0.22, 0.1025, 0.1);
-  control.castShadow = true;
-  group.add(plinth, platter, control);
+  platterGroup.add(platter, label);
+
+  const tonearm = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.006, 0.006, 0.18, 8),
+    new THREE.MeshStandardMaterial({ color: 0xa77a3f, roughness: 0.35, metalness: 0.55 }),
+  );
+  tonearm.position.set(0.14, 0.11, 0.02);
+  tonearm.rotation.z = Math.PI / 2.4;
+  tonearm.rotation.y = -0.35;
+  tonearm.castShadow = true;
+
+  group.add(plinth, platterGroup, tonearm);
+  group.userData.platterGroup = platterGroup;
   return group;
 }
 
@@ -32,28 +44,29 @@ export function createVinyl() {
   const fallback = createFallback();
   group.add(fallback);
 
-  // Speaker + radio as music-station stand-ins when GLBs load
-  const radio = loadModel('/models/radio.glb', { height: 0.28 });
-  radio.visible = false;
-  radio.position.set(-0.12, 0, 0);
-  group.add(radio);
+  const player = loadModel('/models/vinyl-player.glb', { height: 0.32 });
+  player.visible = false;
+  group.add(player);
 
-  const speaker = loadModel('/models/speaker.glb', { height: 0.22 });
-  speaker.visible = false;
-  speaker.position.set(0.18, 0, 0.02);
-  group.add(speaker);
+  let platter = fallback.userData.platterGroup;
+  let spinning = true;
 
   const poll = () => {
-    const radioReady = radio.userData.assetStatus === 'loaded';
-    const speakerReady = speaker.userData.assetStatus === 'loaded';
-    const radioErr = radio.userData.assetStatus === 'error';
-    const speakerErr = speaker.userData.assetStatus === 'error';
-    if (radioReady || speakerReady) {
+    if (player.userData.assetStatus === 'loaded') {
       fallback.visible = false;
-      radio.visible = radioReady;
-      speaker.visible = speakerReady;
-    } else if (radioErr && speakerErr) {
+      player.visible = true;
+      // Only spin a mesh that is clearly the record/platter — never the whole deck.
+      let best = null;
+      player.traverse((o) => {
+        if (!o.isMesh) return;
+        const name = (o.name || '').toLowerCase();
+        if (/platter|disc|record|vinyl/.test(name)) best = o;
+      });
+      platter = best;
+    } else if (player.userData.assetStatus === 'error') {
+      player.visible = false;
       fallback.visible = true;
+      platter = fallback.userData.platterGroup;
     } else {
       nextFrame(poll);
     }
@@ -67,7 +80,10 @@ export function createVinyl() {
     group,
     id: 'music',
     label: 'now spinning',
-    setSpinning: () => {},
-    update: () => {},
+    setSpinning: (v) => { spinning = !!v; },
+    update: (dt) => {
+      if (!spinning || !platter) return;
+      platter.rotation.y += dt * 2.2;
+    },
   };
 }

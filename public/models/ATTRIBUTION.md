@@ -26,8 +26,14 @@ Source pack: [Kenney Furniture Kit](https://kenney.nl/assets/furniture-kit) (CC0
 | `models/books.glb` | `books.glb` |
 | `models/plant.glb` | `plantSmall2.glb` |
 | `models/potted-plant.glb` | `pottedPlant.glb` |
-| `models/radio.glb` | `radio.glb` |
-| `models/speaker.glb` | `speakerSmall.glb` |
 | `models/keyboard.glb` | `computerKeyboard.glb` |
+| `models/radio.glb` | `radio.glb` (unused spare) |
+| `models/speaker.glb` | `speakerSmall.glb` (unused spare) |
 
-Credit to Kenney / Poly Haven / ambientCG is appreciated but not required under CC0.
+## Models (Poly by Google via GetGLB — CC-BY)
+
+| File | Source | License |
+|------|--------|---------|
+| `models/vinyl-player.glb` | [Retro Record Player](https://www.getglb.com/tools-and-gadgets/retro-record-player/) — Poly by Google | [CC Attribution](https://creativecommons.org/licenses/by/3.0/) |
+
+Credit to Kenney / Poly Haven / ambientCG / Poly by Google as required by each license.

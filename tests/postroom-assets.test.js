@@ -7,8 +7,7 @@ const models = [
   'books.glb',
   'plant.glb',
   'potted-plant.glb',
-  'radio.glb',
-  'speaker.glb',
+  'vinyl-player.glb',
   'keyboard.glb',
 ];
 
@@ -32,7 +31,9 @@ describe('Realtime PBR desk assets', () => {
     expect(attribution).toContain('Kenney');
     expect(attribution).toContain('ambientCG');
     expect(attribution).toContain('Poly Haven');
+    expect(attribution).toContain('vinyl-player.glb');
     expect(attribution).toContain('CC0');
+    expect(attribution).toMatch(/CC Attribution|CC-BY/i);
   });
 
   it.each(models)('%s exists under public/models', async (name) => {
