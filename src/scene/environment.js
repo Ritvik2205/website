@@ -60,19 +60,19 @@ export function createEnvironment() {
   const wallMat = plasterMaterial();
 
   const deskBody = new THREE.Mesh(
-    new THREE.BoxGeometry(4.4, 0.09, 1.7),
+    new THREE.BoxGeometry(4.4, 0.09, 1.35),
     deskMat,
   );
-  deskBody.position.set(0, 0.375, -0.35);
+  deskBody.position.set(0, 0.375, -0.525);
   deskBody.castShadow = true;
   deskBody.receiveShadow = true;
   group.add(deskBody);
 
   const deskTop = new THREE.Mesh(
-    new THREE.BoxGeometry(4.4, 0.04, 1.7),
+    new THREE.BoxGeometry(4.4, 0.04, 1.35),
     deskMat,
   );
-  deskTop.position.set(0, 0.42, -0.35);
+  deskTop.position.set(0, 0.42, -0.525);
   deskTop.castShadow = true;
   deskTop.receiveShadow = true;
   // aoMap needs a second UV set; duplicate uv -> uv2
@@ -84,7 +84,7 @@ export function createEnvironment() {
     new THREE.BoxGeometry(4.4, 0.18, 0.07),
     edgeMat,
   );
-  deskEdge.position.set(0, 0.33, 0.53);
+  deskEdge.position.set(0, 0.33, 0.15);
   deskEdge.castShadow = true;
   deskEdge.receiveShadow = true;
   group.add(deskEdge);

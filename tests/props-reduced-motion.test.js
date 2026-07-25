@@ -174,7 +174,7 @@ describe('Monsoon Postroom remaining procedural props', () => {
     expect(base.geometry.parameters).toMatchObject({ width: 0.42, height: 0.02, depth: 0.3 });
     expect(lid.geometry.parameters).toMatchObject({ width: 0.42, height: 0.28, depth: 0.015 });
     expect(screen.geometry.parameters).toMatchObject({ width: 0.38, height: 0.24 });
-    expect(laptop.group.position).toMatchObject({ x: 0.95, y: 0.42, z: -0.05 });
+    expect(laptop.group.position).toMatchObject({ x: 0.55, y: 0.42, z: -0.2 });
     expect(laptop.group.rotation.y).toBeCloseTo(-0.38);
     expect(base.material.color.getHex()).toBe(0x171b22);
     expect(lid.material.color.getHex()).toBe(0x171b22);
@@ -215,7 +215,7 @@ describe('Monsoon Postroom remaining procedural props', () => {
     expect(spine.geometry.parameters).toMatchObject({ width: 0.03, height: 0.055, depth: 0.3 });
     expect(pages.geometry.parameters).toMatchObject({ width: 0.2, height: 0.035, depth: 0.28 });
     expect(strap.geometry.parameters).toMatchObject({ width: 0.24, height: 0.012, depth: 0.03 });
-    expect(group.position).toMatchObject({ x: -0.75, y: 0.42, z: 0.18 });
+    expect(group.position).toMatchObject({ x: -0.5, y: 0.42, z: 0.05 });
     expect(group.rotation.y).toBeCloseTo(0.28);
     expect(cover.material.color.getHex()).toBe(0x765137);
     expect(pages.material.color.getHex()).toBe(0xe7dec9);
@@ -252,7 +252,7 @@ describe('Monsoon Postroom remaining procedural props', () => {
         && geometry.parameters.height === 0.14
         && geometry.parameters.radialSegments === 10
     ))).toBe(true);
-    expect(group.position).toMatchObject({ x: 0, y: 0.42, z: 0.32 });
+    expect(group.position).toMatchObject({ x: 0, y: 0.42, z: 0.12 });
     expect(group.rotation.y).toBeCloseTo(0.04);
     expect(pages.every(({ material }) => material.color.getHex() === 0xe7dec9)).toBe(true);
     expect(canvases[0].draws).toEqual(expect.arrayContaining([
