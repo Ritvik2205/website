@@ -4,6 +4,9 @@ import gallery from './gallery.json';
 import site from './site.json';
 import { parseFrontmatter } from './frontmatter.js';
 
+// `present` sorts after any YYYY-MM, so ongoing work counts as most recent.
+const byRecency = (a, b) => b.end.localeCompare(a.end) || b.start.localeCompare(a.start);
+
 const mdFiles = import.meta.glob('./blog/*.md', { query: '?raw', import: 'default', eager: true });
 
 export async function loadContent() {
@@ -18,5 +21,5 @@ export async function loadContent() {
       };
     })
     .sort((a, b) => b.date.localeCompare(a.date));
-  return { projects, experience, gallery, site, posts };
+  return { projects, experience: [...experience].sort(byRecency), gallery, site, posts };
 }

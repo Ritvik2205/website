@@ -24,8 +24,16 @@ describe('content', () => {
       expect(Array.isArray(p.tech)).toBe(true);
     }
     for (const n of c.experience) {
-      expect(['sticky', 'ruled', 'polaroid']).toContain(n.type);
-      expect(Array.isArray(n.connections)).toBe(true);
+      expect(n).toMatchObject({
+        id: expect.any(String),
+        title: expect.any(String),
+        org: expect.any(String),
+        summary: expect.any(String),
+        body: expect.any(String),
+      });
+      expect(n.start).toMatch(/^\d{4}-\d{2}$/);
+      expect(n.end).toMatch(/^(\d{4}-\d{2}|present)$/);
+      expect(Array.isArray(n.tags)).toBe(true);
     }
     expect(c.gallery.length).toBeGreaterThan(0);
     expect(c.gallery.every((g) => ['sketch', 'photo'].includes(g.type))).toBe(true);
@@ -33,6 +41,13 @@ describe('content', () => {
     expect(c.posts.length).toBeGreaterThan(0);
     expect(c.posts[0].title).toBeTruthy();
     expect(c.posts[0].body).toContain('#');
+  });
+
+  it('sorts experience most recent first, ongoing work on top', async () => {
+    const c = await loadContent();
+    expect(c.experience[0].end).toBe('present');
+    const ends = c.experience.map((n) => n.end);
+    expect(ends).toEqual([...ends].sort().reverse());
   });
 
   it('sorts posts newest first', async () => {

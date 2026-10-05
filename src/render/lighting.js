@@ -6,6 +6,7 @@ let windowLight;
 let hemiLight;
 let lampSpot;
 let lampTarget;
+let pendantSpot;
 
 const WINDOW_POS = new THREE.Vector3(2.2, 2.6, -0.4);
 const DESK_AIM = new THREE.Vector3(0.2, 0.44, -0.35);
@@ -49,9 +50,22 @@ export function createLighting(scene) {
   lampSpot.shadow.bias = -0.0002;
   scene.add(lampSpot);
 
+  // Top-down pendant over the board: a narrow warm pool with hard falloff
+  // (see docs/superpowers/specs/2026-10-06-investigation-board-design.md).
+  pendantSpot = new THREE.SpotLight(0xffb066, 4.2, 3.4, 0.72, 0.7, 1.4);
+  pendantSpot.position.set(0, 1.9, -0.92);
+  pendantSpot.target.position.set(0, 1.2, -1.17);
+  pendantSpot.castShadow = true;
+  pendantSpot.shadow.mapSize.set(1024, 1024);
+  pendantSpot.shadow.bias = -0.0004;
+  pendantSpot.shadow.normalBias = 0.01;
+  scene.add(pendantSpot);
+  scene.add(pendantSpot.target);
+
   applyMood(lampMood);
 
   return {
+    pendantSpot,
     windowLight,
     hemiLight,
     lampSpot,
@@ -72,6 +86,14 @@ export function attachLampLight(lampGroup, shadeLocal = new THREE.Vector3(-1.03,
   }
 }
 
+/** Put the pendant spot at the bulb and aim it at `targetWorld` (the board face). */
+export function attachPendantLight(pendantGroup, bulbLocal, targetWorld) {
+  if (!pendantSpot || !pendantGroup) return;
+  pendantGroup.updateMatrixWorld(true);
+  pendantSpot.position.copy(pendantGroup.localToWorld(bulbLocal.clone()));
+  if (targetWorld) pendantSpot.target.position.copy(targetWorld);
+}
+
 function applyMood(t) {
   if (!windowLight || !hemiLight || !lampSpot) return;
   const warm = THREE.MathUtils.clamp(t, 0.15, 1);
@@ -81,7 +103,7 @@ function applyMood(t) {
   // Warm orange when on; still amber (not cool white) when dimmed
   lampSpot.color.setHex(warm > 0.5 ? 0xff8c3a : 0xe8792e);
 
-  windowLight.intensity = THREE.MathUtils.lerp(0.85, 1.55, cool);
+  windowLight.intensity = THREE.MathUtils.lerp(0.5, 1.05, cool);
   windowLight.color.setRGB(
     THREE.MathUtils.lerp(0.95, 0.82, cool),
     THREE.MathUtils.lerp(0.9, 0.89, cool),
@@ -99,8 +121,8 @@ function applyMood(t) {
     );
   }
 
-  // Stylized look: generous sky fill so shadows read soft blue, never black.
-  hemiLight.intensity = THREE.MathUtils.lerp(0.9, 1.35, warm);
+  // Rough look: low fill so the room falls off into shadow between lamp pools.
+  hemiLight.intensity = THREE.MathUtils.lerp(0.3, 0.55, warm);
   hemiLight.color.setHex(warm > 0.4 ? 0xd9dcf0 : 0xb4c4e0);
   hemiLight.groundColor.setHex(warm > 0.4 ? 0x4a3a30 : 0x26324a);
 }

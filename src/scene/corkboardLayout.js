@@ -1,155 +1,135 @@
 /**
- * Shared corkboard composition — percentage coords (0–100) on the board face.
- * Used by the 3D scene and the DOM overlay so the open view matches the default board.
+ * Investigation-wall collage in board-local meters (origin at the board center, Y up).
+ * Deterministic: the same seed always yields the same wall.
+ * See docs/superpowers/specs/2026-10-06-investigation-board-design.md.
  */
 
-/** Decorative polaroids / scraps (not clickable). */
-export const CORK_FILLERS = [
-  { id: 'f01', kind: 'polaroid', left: 4, top: 6, w: 11, h: 14, rot: -6 },
-  { id: 'f02', kind: 'polaroid', left: 14, top: 3, w: 13, h: 16, rot: 3 },
-  { id: 'f03', kind: 'polaroid', left: 28, top: 5, w: 10, h: 13, rot: -2 },
-  { id: 'f04', kind: 'scrap', left: 38, top: 4, w: 7, h: 8, rot: 8 },
-  { id: 'f05', kind: 'polaroid', left: 46, top: 2, w: 12, h: 15, rot: -4 },
-  { id: 'f06', kind: 'polaroid', left: 58, top: 6, w: 10, h: 12, rot: 5 },
-  { id: 'f07', kind: 'polaroid', left: 70, top: 3, w: 14, h: 17, rot: -3 },
-  { id: 'f08', kind: 'scrap', left: 84, top: 5, w: 6, h: 7, rot: -9 },
-  { id: 'f09', kind: 'polaroid', left: 88, top: 10, w: 9, h: 12, rot: 4 },
-  { id: 'f10', kind: 'polaroid', left: 2, top: 24, w: 12, h: 15, rot: 2 },
-  { id: 'f11', kind: 'scrap', left: 16, top: 22, w: 5, h: 6, rot: -5 },
-  { id: 'f12', kind: 'polaroid', left: 22, top: 28, w: 11, h: 14, rot: -7 },
-  { id: 'f13', kind: 'polaroid', left: 36, top: 20, w: 9, h: 11, rot: 6 },
-  { id: 'f14', kind: 'polaroid', left: 48, top: 24, w: 13, h: 16, rot: -2 },
-  { id: 'f15', kind: 'scrap', left: 62, top: 22, w: 6, h: 7, rot: 11 },
-  { id: 'f16', kind: 'polaroid', left: 70, top: 26, w: 10, h: 13, rot: 3 },
-  { id: 'f17', kind: 'polaroid', left: 82, top: 28, w: 12, h: 14, rot: -5 },
-  { id: 'f18', kind: 'polaroid', left: 6, top: 46, w: 10, h: 12, rot: 4 },
-  { id: 'f19', kind: 'polaroid', left: 18, top: 48, w: 14, h: 17, rot: -3 },
-  { id: 'f20', kind: 'scrap', left: 34, top: 44, w: 5, h: 6, rot: -8 },
-  { id: 'f21', kind: 'polaroid', left: 42, top: 50, w: 11, h: 13, rot: 5 },
-  { id: 'f22', kind: 'polaroid', left: 56, top: 46, w: 9, h: 12, rot: -6 },
-  { id: 'f23', kind: 'polaroid', left: 68, top: 50, w: 12, h: 15, rot: 2 },
-  { id: 'f24', kind: 'scrap', left: 82, top: 48, w: 7, h: 8, rot: 7 },
-  { id: 'f25', kind: 'polaroid', left: 90, top: 52, w: 8, h: 11, rot: -4 },
-  { id: 'f26', kind: 'polaroid', left: 3, top: 68, w: 11, h: 14, rot: -2 },
-  { id: 'f27', kind: 'polaroid', left: 16, top: 72, w: 9, h: 12, rot: 6 },
-  { id: 'f28', kind: 'scrap', left: 28, top: 70, w: 6, h: 7, rot: -10 },
-  { id: 'f29', kind: 'polaroid', left: 36, top: 74, w: 13, h: 15, rot: 3 },
-  { id: 'f30', kind: 'polaroid', left: 52, top: 70, w: 10, h: 13, rot: -5 },
-  { id: 'f31', kind: 'polaroid', left: 64, top: 74, w: 12, h: 14, rot: 4 },
-  { id: 'f32', kind: 'scrap', left: 78, top: 72, w: 5, h: 6, rot: 9 },
-  { id: 'f33', kind: 'polaroid', left: 86, top: 68, w: 11, h: 14, rot: -3 },
+export const BOARD = { width: 2.5, height: 0.95 };
+
+/** Four pinned experience sheets, filled from the most recent content entries. */
+export const FEATURED_SLOTS = [
+  { x: -0.8, y: 0.12, w: 0.23, h: 0.29, rot: -2.5 },
+  { x: -0.34, y: -0.13, w: 0.23, h: 0.29, rot: 1.5 },
+  { x: 0.42, y: 0.07, w: 0.23, h: 0.29, rot: -1 },
+  { x: 0.88, y: -0.11, w: 0.23, h: 0.29, rot: 2.5 },
 ];
 
-/**
- * Clickable experience notes — same visual language as fillers, keyed by content id.
- * Positions chosen among denser clusters so they read as part of the board.
- */
-export const CORK_INTERACTIVE = [
-  { id: 'internship', kind: 'ruled', left: 8, top: 18, w: 14, h: 16, rot: -3 },
-  { id: 'cmu', kind: 'sticky', left: 32, top: 14, w: 12, h: 14, rot: 2 },
-  { id: 'hackathon', kind: 'ruled', left: 54, top: 18, w: 13, h: 15, rot: -2 },
-  { id: 'trading', kind: 'ruled', left: 76, top: 16, w: 14, h: 16, rot: 3 },
-  { id: 'photo-note', kind: 'polaroid', left: 24, top: 58, w: 13, h: 18, rot: -4 },
-  { id: 'misc', kind: 'sticky', left: 58, top: 60, w: 12, h: 13, rot: 4 },
+/** Large set pieces, like the reference wall's "master plan", map, and calendar. */
+export const SET_PIECES = [
+  { id: 'poster', kind: 'poster', x: 0.02, y: 0.28, w: 0.36, h: 0.22, rot: 0.6 },
+  { id: 'map', kind: 'map', x: 0.06, y: -0.23, w: 0.42, h: 0.3, rot: -0.6 },
+  { id: 'calendar', kind: 'calendar', x: -0.36, y: 0.27, w: 0.22, h: 0.16, rot: 1.2 },
 ];
 
-/** Extra pin nodes (percent) that only exist to densify the red-string web. */
-export const CORK_PIN_NODES = [
-  { id: 'p1', left: 20, top: 12 },
-  { id: 'p2', left: 42, top: 10 },
-  { id: 'p3', left: 66, top: 14 },
-  { id: 'p4', left: 12, top: 36 },
-  { id: 'p5', left: 50, top: 38 },
-  { id: 'p6', left: 78, top: 40 },
-  { id: 'p7', left: 30, top: 56 },
-  { id: 'p8', left: 70, top: 58 },
-  { id: 'p9', left: 44, top: 78 },
-  { id: 'p10', left: 88, top: 36 },
-  { id: 'p11', left: 6, top: 58 },
-  { id: 'p12', left: 94, top: 74 },
+/** Only a handful of threads, from pin to pin (`f<n>` = featured slot n). */
+export const THREADS = [
+  ['poster', 'f0'],
+  ['poster', 'f2'],
+  ['f0', 'f1'],
+  ['f2', 'f3'],
+  ['f1', 'map'],
 ];
 
-/**
- * Dense string web as pairs of node keys.
- * Keys: `i:<experienceId>`, `f:<fillerId>`, or `p:<pinId>`.
- */
-export const CORK_STRINGS = [
-  ['i:internship', 'i:cmu'],
-  ['i:cmu', 'i:hackathon'],
-  ['i:hackathon', 'i:trading'],
-  ['i:trading', 'i:internship'],
-  ['i:photo-note', 'i:misc'],
-  ['i:misc', 'i:cmu'],
-  ['i:internship', 'p:p1'],
-  ['i:cmu', 'p:p2'],
-  ['i:hackathon', 'p:p3'],
-  ['i:trading', 'p:p6'],
-  ['i:photo-note', 'p:p7'],
-  ['i:misc', 'p:p8'],
-  ['p:p1', 'p:p4'],
-  ['p:p4', 'p:p5'],
-  ['p:p5', 'p:p3'],
-  ['p:p2', 'p:p5'],
-  ['p:p5', 'p:p6'],
-  ['p:p6', 'p:p10'],
-  ['p:p7', 'p:p9'],
-  ['p:p8', 'p:p9'],
-  ['p:p9', 'p:p12'],
-  ['p:p11', 'p:p7'],
-  ['p:p11', 'i:internship'],
-  ['p:p4', 'f:f12'],
-  ['p:p5', 'f:f14'],
-  ['p:p6', 'f:f17'],
-  ['p:p2', 'f:f05'],
-  ['p:p3', 'f:f07'],
-  ['p:p8', 'f:f23'],
-  ['p:p9', 'f:f29'],
-  ['f:f01', 'f:f10'],
-  ['f:f10', 'f:f19'],
-  ['f:f19', 'f:f26'],
-  ['f:f07', 'f:f16'],
-  ['f:f16', 'f:f23'],
-  ['f:f23', 'f:f33'],
-  ['f:f14', 'f:f21'],
-  ['f:f21', 'f:f30'],
-  ['f:f02', 'p:p1'],
-  ['f:f17', 'p:p10'],
-  ['f:f33', 'p:p12'],
-  ['i:trading', 'f:f09'],
-  ['i:photo-note', 'f:f19'],
-  ['i:misc', 'f:f31'],
+const DECOR_KINDS = [
+  ['page', 0.3],
+  ['sticky', 0.12],
+  ['photo', 0.2],
+  ['index', 0.14],
+  ['clipping', 0.15],
+  ['receipt', 0.09],
 ];
 
-export const BOARD_WORLD = { width: 2.7, height: 1.3 };
-
-/** Convert percent layout point to local board XY (origin center, Y up). */
-export function percentToBoardXY(left, top) {
-  const x = ((left / 100) - 0.5) * BOARD_WORLD.width;
-  const y = (0.5 - (top / 100)) * BOARD_WORLD.height;
-  return { x, y };
-}
-
-export function percentSizeToWorld(w, h) {
-  return {
-    w: (w / 100) * BOARD_WORLD.width,
-    h: (h / 100) * BOARD_WORLD.height,
+function mulberry32(seed) {
+  let a = seed >>> 0;
+  return () => {
+    a = (a + 0x6d2b79f5) >>> 0;
+    let t = a;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   };
 }
 
-/** Resolve a string endpoint key to percent position. */
-export function resolveNodePercent(key) {
-  const [kind, id] = key.split(':');
-  if (kind === 'i') {
-    const n = CORK_INTERACTIVE.find((item) => item.id === id);
-    return n ? { left: n.left + n.w / 2, top: n.top + 4 } : null;
+function overlapArea(a, b) {
+  const ox = Math.min(a.x + a.w / 2, b.x + b.w / 2) - Math.max(a.x - a.w / 2, b.x - b.w / 2);
+  const oy = Math.min(a.y + a.h / 2, b.y + b.h / 2) - Math.max(a.y - a.h / 2, b.y - b.h / 2);
+  return ox > 0 && oy > 0 ? ox * oy : 0;
+}
+
+function sizeFor(kind, rnd) {
+  switch (kind) {
+    case 'page': { const w = 0.13 + rnd() * 0.04; return { w, h: w * 1.3 }; }
+    case 'photo': return rnd() < 0.6 ? { w: 0.13, h: 0.095 } : { w: 0.095, h: 0.13 };
+    case 'index': return { w: 0.13, h: 0.08 };
+    case 'clipping': return { w: 0.1 + rnd() * 0.04, h: 0.13 + rnd() * 0.05 };
+    case 'receipt': return { w: 0.05, h: 0.16 + rnd() * 0.04 };
+    default: return { w: 0.065, h: 0.065 };
   }
-  if (kind === 'f') {
-    const n = CORK_FILLERS.find((item) => item.id === id);
-    return n ? { left: n.left + n.w / 2, top: n.top + 3 } : null;
+}
+
+function pickKind(rnd) {
+  let r = rnd();
+  for (const [kind, weight] of DECOR_KINDS) {
+    if ((r -= weight) <= 0) return kind;
   }
-  if (kind === 'p') {
-    const n = CORK_PIN_NODES.find((item) => item.id === id);
-    return n ? { left: n.left, top: n.top } : null;
+  return 'page';
+}
+
+/**
+ * Decorative sheets placed by rejection sampling. They may overlap each other
+ * (it is a collage) but never cover a featured sheet or the poster.
+ */
+export function buildDecor({ seed = 7, attempts = 1400, max = 84 } = {}) {
+  const rnd = mulberry32(seed);
+  const protectedRects = [
+    ...FEATURED_SLOTS.map((s) => ({ ...s, w: s.w + 0.02, h: s.h + 0.02 })),
+    { ...SET_PIECES[0], w: SET_PIECES[0].w + 0.02, h: SET_PIECES[0].h + 0.02 },
+  ];
+  const placed = [];
+  const margin = 0.04;
+
+  const tryPlace = (sheet) => {
+    const inside = Math.abs(sheet.x) + sheet.w / 2 < BOARD.width / 2 - margin
+      && Math.abs(sheet.y) + sheet.h / 2 < BOARD.height / 2 - margin;
+    if (!inside) return false;
+    if (protectedRects.some((p) => overlapArea(sheet, p) > 0)) return false;
+    const area = sheet.w * sheet.h;
+    if (placed.some((p) => overlapArea(sheet, p) > area * 0.45)) return false;
+    placed.push(sheet);
+    return true;
+  };
+
+  for (let i = 0; i < attempts && placed.length < max; i++) {
+    const kind = pickKind(rnd);
+    const x = (rnd() - 0.5) * BOARD.width;
+    const y = (rnd() - 0.5) * BOARD.height;
+    const rot = (rnd() - 0.5) * 9;
+    if (kind === 'sticky') {
+      // Stickies come in small clusters, like the reference wall.
+      const count = 2 + Math.floor(rnd() * 3);
+      for (let k = 0; k < count && placed.length < max; k++) {
+        tryPlace({
+          id: `d${placed.length}`, kind, variant: Math.floor(rnd() * 4),
+          x: x + (k % 2) * 0.072 + (rnd() - 0.5) * 0.01,
+          y: y - Math.floor(k / 2) * 0.072 + (rnd() - 0.5) * 0.01,
+          w: 0.065, h: 0.065, rot: (rnd() - 0.5) * 8, seed: Math.floor(rnd() * 1e9),
+        });
+      }
+      continue;
+    }
+    tryPlace({
+      id: `d${placed.length}`, kind, variant: Math.floor(rnd() * 4),
+      x, y, ...sizeFor(kind, rnd), rot, seed: Math.floor(rnd() * 1e9),
+    });
   }
-  return null;
+  return placed;
+}
+
+/** Pin point (top-center) of a featured slot or set piece, in board-local meters. */
+export function pinPoint(key) {
+  const sheet = key.startsWith('f')
+    ? FEATURED_SLOTS[Number(key.slice(1))]
+    : SET_PIECES.find((s) => s.id === key);
+  if (!sheet) return null;
+  return { x: sheet.x, y: sheet.y + sheet.h / 2 - 0.02 };
 }

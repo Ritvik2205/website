@@ -9,8 +9,14 @@ const DESK_Y = 0.44;
  */
 export const LAYOUT = {
   deskY: DESK_Y,
+  // Board sits lower so the pendant above it reads in the idle frame.
   corkboard: {
-    position: [0, 1.42, -1.17],
+    position: [0, 1.25, -1.17],
+    rotation: [0, 0, 0],
+    scale: 1.0,
+  },
+  pendant: {
+    position: [0, 1.84, -0.92],
     rotation: [0, 0, 0],
     scale: 1.0,
   },
@@ -70,9 +76,10 @@ export const CAMERA_ANCHORS = {
     position: { x: -0.4, y: 0.82, z: -0.05 },
     lookAt: { x: -0.4, y: 0.55, z: -0.55 },
   },
+  // Fallback only: main.js frames the board from the viewport aspect.
   experience: {
-    position: { x: 0, y: 1.35, z: -0.1 },
-    lookAt: { x: 0, y: 1.42, z: -1.17 },
+    position: { x: 0, y: 1.3, z: 0.6 },
+    lookAt: { x: 0, y: 1.25, z: -1.17 },
   },
 };
 

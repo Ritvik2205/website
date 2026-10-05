@@ -1,44 +1,62 @@
 [
   {
     "id": "internship",
-    "type": "ruled",
-    "title": "Internship @ ...",
-    "body": "Placeholder: internship details — team, what you built, impact. Replace with the real experience.",
-    "connections": ["cmu"]
-  },
-  {
-    "id": "cmu",
-    "type": "sticky",
-    "title": "CMU",
-    "body": "Placeholder: studying at Carnegie Mellon. Courses, focus areas, activities.",
-    "connections": ["hackathon"]
-  },
-  {
-    "id": "hackathon",
-    "type": "ruled",
-    "title": "Hackathon win",
-    "body": "Placeholder: Neuphonic Edinburgh hackathon — what the team built and how it went.",
-    "connections": []
-  },
-  {
-    "id": "photo-note",
-    "type": "polaroid",
-    "title": "somewhere in London",
-    "body": "Placeholder: a photo and the story behind it.",
-    "connections": ["misc"]
-  },
-  {
-    "id": "misc",
-    "type": "sticky",
-    "title": "todo",
-    "body": "Placeholder: things I'm currently exploring — replace with a real list.",
-    "connections": []
+    "title": "Software Engineering Intern",
+    "org": "Placeholder Co.",
+    "start": "2026-05",
+    "end": "2026-08",
+    "summary": "Placeholder: one line on the team and what you shipped.",
+    "body": "Placeholder: internship details — team, what you built, the stack, and measurable impact. Replace with the real experience.",
+    "tags": ["TypeScript", "Distributed systems"]
   },
   {
     "id": "trading",
-    "type": "ruled",
-    "title": "IMC Prosperity",
-    "body": "Placeholder: algorithmic trading competition — strategy and results.",
-    "connections": ["internship"]
+    "title": "Competitor",
+    "org": "IMC Prosperity",
+    "start": "2026-03",
+    "end": "2026-04",
+    "summary": "Placeholder: algorithmic trading competition — strategy and placing.",
+    "body": "Placeholder: algorithmic trading competition — the strategies you tried, how you backtested them, and results.",
+    "tags": ["Python", "Market making"]
+  },
+  {
+    "id": "hackathon",
+    "title": "Winner",
+    "org": "Neuphonic Hackathon, Edinburgh",
+    "start": "2025-11",
+    "end": "2025-11",
+    "summary": "Placeholder: what the team built in a weekend and why it won.",
+    "body": "Placeholder: Neuphonic Edinburgh hackathon — the problem, what the team built, your part in it, and how it went.",
+    "tags": ["Voice AI", "Hackathon"]
+  },
+  {
+    "id": "cmu",
+    "title": "B.S. Computer Science",
+    "org": "Carnegie Mellon University",
+    "start": "2024-08",
+    "end": "present",
+    "summary": "Placeholder: focus areas and standout courses.",
+    "body": "Placeholder: studying at Carnegie Mellon. Courses, focus areas, research, and activities.",
+    "tags": ["Systems", "ML"]
+  },
+  {
+    "id": "london",
+    "title": "Study Abroad",
+    "org": "London",
+    "start": "2025-09",
+    "end": "2025-12",
+    "summary": "Placeholder: a semester away and what it taught you.",
+    "body": "Placeholder: a photo and the story behind it.",
+    "tags": ["Travel"]
+  },
+  {
+    "id": "exploring",
+    "title": "Currently Exploring",
+    "org": "Side projects",
+    "start": "2026-01",
+    "end": "present",
+    "summary": "Placeholder: what you're tinkering with right now.",
+    "body": "Placeholder: things I'm currently exploring — replace with a real list.",
+    "tags": ["Learning"]
   }
 ]

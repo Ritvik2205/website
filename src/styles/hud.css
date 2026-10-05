@@ -72,3 +72,48 @@
   .hud-link { flex: none; padding: 11px 13px; }
   .hud-tip { display: none; }
 }
+
+/* ---- corkboard mode chrome ---- */
+.board-ui[hidden], .board-card[hidden], .board-hint[hidden] { display: none; }
+.board-hint {
+  position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%);
+  display: flex; align-items: center; gap: 14px; padding: 6px 6px 6px 18px;
+  background: var(--glass); border: 1px solid var(--hairline); border-radius: 999px;
+  backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+  color: var(--rag-paper); font: 700 .72rem/1 var(--font-mono); letter-spacing: .06em; text-transform: uppercase;
+}
+.board-hint-action, .board-card-more {
+  cursor: pointer; border: 0; border-radius: 999px; padding: 11px 16px;
+  background: var(--honey-lamp); color: var(--storm-ink);
+  font: 700 .72rem/1 var(--font-mono); letter-spacing: .06em; text-transform: uppercase;
+  transition: transform .25s var(--ease-out), background-color .2s;
+}
+.board-hint-action:hover, .board-card-more:hover { transform: translateY(-1px); background: #ffbd63; }
+.board-hint-action:focus-visible, .board-card-more:focus-visible, .board-card-close:focus-visible {
+  outline: 2px solid var(--rag-paper); outline-offset: 3px;
+}
+.board-card {
+  position: fixed; top: 50%; translate: 0 -50%; width: min(360px, calc(100vw - 32px));
+  padding: 24px 24px 22px; border-radius: var(--radius);
+  background: var(--glass-strong); border: 1px solid var(--hairline); color: var(--rag-paper);
+  backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, .45);
+}
+.board-card[data-side="right"] { right: 6vw; }
+.board-card[data-side="left"] { left: 6vw; }
+.board-card-close {
+  position: absolute; top: 10px; right: 12px; cursor: pointer; border: 0; background: none;
+  color: var(--rag-paper); opacity: .7; font-size: 1.5rem; line-height: 1;
+}
+.board-card-meta {
+  margin: 0 0 12px; color: var(--honey-lamp);
+  font: 700 .66rem/1.3 var(--font-mono); letter-spacing: .08em; text-transform: uppercase;
+}
+.board-card-org { margin: 0; font: 600 1.7rem/1.05 var(--font-display); letter-spacing: -.01em; }
+.board-card-role { margin: 6px 0 14px; color: var(--verdigris); font: italic 400 1.05rem/1.3 var(--font-display); }
+.board-card-summary { margin: 0 0 14px; opacity: .9; font: 400 1rem/1.55 var(--font-display); }
+.board-card-tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 18px; padding: 0; list-style: none; }
+.board-card-tags li {
+  padding: 4px 8px; border-radius: 999px; border: 1px solid var(--hairline);
+  font: 700 .6rem/1.2 var(--font-mono); letter-spacing: .06em; text-transform: uppercase;
+}

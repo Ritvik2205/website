@@ -17,7 +17,7 @@ export function createEngine(canvas) {
 
   const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 20);
 
-  const { composer, setSize } = createComposer(renderer, scene, camera);
+  const { composer, setSize, update: updatePost } = createComposer(renderer, scene, camera);
 
   const tickFns = [];
   let paused = false;
@@ -27,6 +27,7 @@ export function createEngine(canvas) {
     const dt = clock.getDelta();
     if (paused) return;
     for (const fn of tickFns) fn(dt);
+    updatePost(dt);
     composer.render();
   }
 

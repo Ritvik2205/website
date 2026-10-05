@@ -5,7 +5,7 @@ Prefer content edits here over code changes. Static assets belong in `../../publ
 ## Schemas
 
 - `projects.json`: entries use `id`, `title`, `description`, `tech` array, `image`, `repoUrl`, and `liveUrl`.
-- `experience.json`: entries use `id`, `type` (`sticky`, `ruled`, or `polaroid`), `title`, `body`, and a `connections` array of note IDs.
+- `experience.json`: entries use `id`, `title` (role), `org`, `start` (`YYYY-MM`), `end` (`YYYY-MM` or `present`), `summary` (one line, printed on the 3D board sheet and card), `body`, and a `tags` array. The loader sorts newest first; the first four become the pinned sheets on the 3D board.
 - `gallery.json`: entries use `src`, `caption`, and `type` (`sketch` or `photo`).
 - `site.json`: contains the display name, Spotify `playlistId` and `profileUrl`, and social links.
 - `blog/*.md`: begin with `---` frontmatter containing `title:` and ISO `date: YYYY-MM-DD`, followed by Markdown body.
@@ -13,7 +13,7 @@ Prefer content edits here over code changes. Static assets belong in `../../publ
 ## Loading Rules
 
 - `loader.js` eagerly imports `./blog/*.md`, parses frontmatter, and sorts posts newest-first by the ISO date string.
-- Keep referenced IDs unique and keep experience connection IDs valid.
+- Keep referenced IDs unique.
 - Do not add executable HTML or untrusted content; blog bodies are rendered through `marked.parse()`.
 - Add source images to `public/`, not `dist/`; Vite copies public assets into builds.
 

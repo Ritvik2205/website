@@ -365,7 +365,25 @@ def build_keyboard():
     return r
 
 
+def build_pendant():
+    """Top-down metal pendant over the board. Rim sits on z=0; cord rises above."""
+    r = root('pendant')
+    H = 0.17
+    shell = cyl(0.16, 0.045, H, 48, caps=False)
+    bmesh.ops.solidify(shell, geom=shell.faces, thickness=0.004)
+    new_obj('PendantShade', shell, mat('graphite', 0.32, 0.65), r, (0, 0, H / 2), bevel=0.0015, segments=2)
+    inner = cyl(0.154, 0.042, H - 0.006, 48, caps=False)
+    bmesh.ops.reverse_faces(inner, faces=inner.faces)  # face inward so the lit inside shows from below
+    new_obj('PendantInner', inner, mat('paper', 0.6, 0, 'honey', 0.8), r, (0, 0, H / 2 + 0.002))
+    new_obj('PendantRim', torus(0.158, 0.004, segs=48, tube=8), mat('honey', 0.35, 0.7), r, (0, 0, 0.002))
+    new_obj('PendantCap', cyl(0.05, 0.04, 0.035, 32), mat('ink', 0.4, 0.6), r, (0, 0, H + 0.015), bevel=0.004)
+    new_obj('PendantCord', cyl(0.004, 0.004, 0.9, 12), mat('ink', 0.7), r, (0, 0, H + 0.03 + 0.45))
+    new_obj('PendantBulb', sphere(0.038), mat('paper', 0.3, 0, 'honey', 9.0), r, (0, 0, 0.07))
+    return r
+
+
 BUILDERS = {
+    'pendant': build_pendant,
     'desk': build_desk,
     'laptop': build_laptop,
     'lamp': build_lamp,
@@ -381,6 +399,7 @@ BUILDERS = {
 
 # three.js LAYOUT poses (x, y, z, rotY) converted to Blender for the preview.
 PREVIEW_POSES = {
+    'pendant': (0, 1.84, -0.92, 0),
     'desk': (0, 0, -0.675, 0),
     'vinyl': (-0.4, 0.44, -0.55, 0.12),
     'journal': (-0.05, 0.44, -0.28, 0.12),

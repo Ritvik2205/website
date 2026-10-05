@@ -16,8 +16,12 @@ export function createCameraRig(camera) {
     // Idle framing is fixed; flyTo/flyHome own motion.
   }
 
+  const reduced = typeof window !== 'undefined'
+    && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+
   function tween(pos, look) {
-    const tl = gsap.timeline({ defaults: { duration: 1.2, ease: 'power2.inOut' } });
+    // Reduced motion: cut straight to the anchor.
+    const tl = gsap.timeline({ defaults: { duration: reduced ? 0 : 1.2, ease: 'power2.inOut' } });
     tl.to(camera.position, { x: pos.x, y: pos.y, z: pos.z }, 0);
     tl.to(lookTarget, {
       x: look.x, y: look.y, z: look.z,

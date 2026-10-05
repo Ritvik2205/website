@@ -16,7 +16,8 @@ Read `../../docs/design/2026-07-21-realtime-pbr-rendering.md` before editing thi
 
 - `lighting.js`: `createLighting(scene)`, `setLampMood`, `getLampMood`, `attachLampLight(target, shadeLocal?)`, `applyWindowFlashLevel(amount)`, `pulseWindowFlash(amount)`. Flash is transient and must re-enter through `applyMood`; it is not a second mood axis.
 - `loadModel.js`: `loadModel(url, { height })` → `{ group, status }`.
-- `composer.js`: keep `RenderPass → UnrealBloomPass → OutputPass` unless a documented visual change requires otherwise.
+- `composer.js`: `RenderPass → UnrealBloomPass → OutputPass → grade ShaderPass` (grain, vignette, sepia; static grain under reduced motion). The grade pass is documented in `docs/superpowers/specs/2026-10-06-investigation-board-design.md`.
+- `attachPendantLight(group, bulbLocal, targetWorld)` places the top-down pendant spot over the corkboard.
 
 ## Assets and Verification
 

@@ -2,129 +2,101 @@ import { readFile } from 'node:fs/promises';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createCorkboard } from '../src/scene/corkboard.js';
 import {
-  CORK_FILLERS,
-  CORK_INTERACTIVE,
-  CORK_STRINGS,
+  BOARD,
+  FEATURED_SLOTS,
+  SET_PIECES,
+  THREADS,
+  buildDecor,
+  pinPoint,
 } from '../src/scene/corkboardLayout.js';
 
 const readSource = (path) => readFile(new URL(path, import.meta.url), 'utf8');
 
-let textDraws;
-let fills;
-
+// Any 2D-context call is a no-op; measureText approximates width for wrapping.
 function stubCanvasDocument() {
-  textDraws = [];
-  fills = [];
-
   vi.stubGlobal('document', {
     createElement: vi.fn(() => {
       const canvas = { width: 0, height: 0 };
-      const pixels = new Uint8ClampedArray(128 * 160 * 4);
-      const context = {
-        fillStyle: '',
-        strokeStyle: '',
-        lineWidth: 1,
-        font: '',
-        beginPath: vi.fn(),
-        moveTo: vi.fn(),
-        lineTo: vi.fn(),
-        arc: vi.fn(),
-        fill: vi.fn(),
-        stroke: vi.fn(),
-        textAlign: '',
-        createLinearGradient: vi.fn(() => ({ addColorStop: vi.fn() })),
-        createRadialGradient: vi.fn(() => ({ addColorStop: vi.fn() })),
-        drawImage: vi.fn(),
-        fillRect: vi.fn((...args) => fills.push({ color: context.fillStyle, args })),
-        fillText: vi.fn((text, x, y) => {
-          textDraws.push({ text, x, y, font: context.font, color: context.fillStyle });
-        }),
-        getImageData: vi.fn(() => ({ data: pixels, width: 128, height: 160 })),
-        putImageData: vi.fn(),
-      };
-      canvas.getContext = vi.fn(() => context);
+      const context = new Proxy({ measureText: (t) => ({ width: String(t).length * 10 }) }, {
+        get: (target, key) => (key in target ? target[key] : () => ({ addColorStop() {} })),
+        set: (target, key, value) => { target[key] = value; return true; },
+      });
+      canvas.getContext = () => context;
       return canvas;
     }),
   });
 }
 
-beforeEach(() => {
-  stubCanvasDocument();
-});
+const overlaps = (a, b) => Math.abs(a.x - b.x) < (a.w + b.w) / 2 && Math.abs(a.y - b.y) < (a.h + b.h) / 2;
 
+const ENTRIES = ['a', 'b', 'c', 'd', 'e'].map((id) => ({
+  id, title: `Role ${id}`, org: `Org ${id}`, start: '2025-01', end: 'present', summary: 's', body: 'b', tags: [],
+}));
+
+beforeEach(() => stubCanvasDocument());
 afterEach(() => {
   vi.restoreAllMocks();
   vi.unstubAllGlobals();
 });
 
-describe('Investigation corkboard (3D)', () => {
-  it('builds a dense board with cork frame, many fillers, and red string web', () => {
-    const { group, id, skipHoverVisual } = createCorkboard();
-    const boxMeshes = group.children.filter(
-      (child) => child.isMesh && child.geometry.type === 'BoxGeometry',
-    );
-    const board = boxMeshes.find(
-      ({ geometry }) => geometry.parameters.width === 2.7,
-    );
-    const frames = boxMeshes.filter(({ geometry }) => geometry.parameters.depth === 0.07);
-    const lines = group.children.filter((child) => child.isLine);
-    const fillerGroups = group.children.filter(
-      (child) => child.isGroup && child.children.length >= 2 && !child.userData.interactiveNote,
-    );
-    const interactive = group.children.filter(
-      (child) => child.isGroup && child.userData.interactiveNote,
-    );
-
-    expect(id).toBe('experience');
-    expect(skipHoverVisual).toBe(true);
-    expect(board.material.color.getHex()).toBe(0xb88d62);
-    expect(frames).toHaveLength(4);
-    expect(fillerGroups.length).toBeGreaterThanOrEqual(CORK_FILLERS.length);
-    expect(interactive).toHaveLength(CORK_INTERACTIVE.length);
-    expect(lines.length).toBe(CORK_STRINGS.length);
-    expect(lines.every(({ material }) => material.color.getHex() === 0xcf6f4e)).toBe(true);
+describe('Investigation board layout', () => {
+  it('is deterministic and dense', () => {
+    const a = buildDecor();
+    expect(buildDecor()).toEqual(a);
+    expect(a.length).toBeGreaterThanOrEqual(60);
+    expect(new Set(a.map((s) => s.kind)).size).toBeGreaterThanOrEqual(5);
   });
 
-  it('keeps interactive note ids aligned with experience slots', () => {
-    const { group } = createCorkboard();
-    const ids = group.children
-      .filter((child) => child.userData?.interactiveNote)
-      .map((child) => child.userData.interactiveNote)
-      .sort();
-    expect(ids).toEqual([...CORK_INTERACTIVE.map((n) => n.id)].sort());
+  it('keeps every decorative sheet on the board and off the featured sheets and poster', () => {
+    const protectedRects = [...FEATURED_SLOTS, SET_PIECES.find((s) => s.id === 'poster')];
+    for (const sheet of buildDecor()) {
+      expect(Math.abs(sheet.x) + sheet.w / 2).toBeLessThan(BOARD.width / 2);
+      expect(Math.abs(sheet.y) + sheet.h / 2).toBeLessThan(BOARD.height / 2);
+      for (const rect of protectedRects) expect(overlaps(sheet, rect)).toBe(false);
+    }
+  });
+
+  it('uses only a handful of threads between real pins', () => {
+    expect(THREADS.length).toBeLessThanOrEqual(6);
+    for (const [a, b] of THREADS) {
+      expect(pinPoint(a)).toBeTruthy();
+      expect(pinPoint(b)).toBeTruthy();
+    }
   });
 });
 
-describe('Investigation corkboard (DOM overlay contract)', () => {
-  it('reuses the shared layout and marks fillers non-interactive', async () => {
-    const source = await readSource('../src/ui/pages/corkboard.js');
-    expect(source).toContain("from '../../scene/corkboardLayout.js'");
-    expect(source).toContain('CORK_FILLERS');
-    expect(source).toContain('CORK_INTERACTIVE');
-    expect(source).toContain('CORK_STRINGS');
-    expect(source).toContain("aria-hidden', 'true'");
-    expect(source).toContain("noteEl.dataset.route = String(i + 1).padStart(2, '0');");
-    expect(source).toContain('<span class="note-route">ROUTE ${route}</span>');
-    expect(source).toContain('<span class="note-title">${note.title}</span>');
+describe('Investigation board (3D)', () => {
+  it('builds a framed board with four featured sheets and sparse threads', () => {
+    const board = createCorkboard();
+    const frames = board.group.children.filter((c) => c.name === 'boardFrame');
+    const threads = board.group.children.filter((c) => c.isLine);
+
+    expect(board.id).toBe('experience');
+    expect(board.skipHoverVisual).toBe(true);
+    expect(frames).toHaveLength(4);
+    expect(board.featured).toHaveLength(FEATURED_SLOTS.length);
+    expect(threads).toHaveLength(THREADS.length);
+    expect(board.sheets.length).toBeGreaterThan(60);
   });
 
-  it('keeps the modal and resize APIs while naming the nested close control', async () => {
-    const source = await readSource('../src/ui/pages/corkboard.js');
-    expect(source).toContain('aria-label="Close note"');
-    expect(source).toContain("window.addEventListener('resize', drawStrings);");
-    expect(source).toContain('el.redrawStrings = drawStrings;');
-    expect(source).toContain('e.stopPropagation();');
+  it('pins the most recent entries onto the featured sheets in order', () => {
+    const board = createCorkboard();
+    board.setFeatured(ENTRIES);
+    expect(board.featured.map((m) => m.userData.experienceId)).toEqual(['a', 'b', 'c', 'd']);
+    expect(board.sheetWorldPosition('b')).toBeTruthy();
+    expect(board.sheetWorldPosition('e')).toBeNull();
   });
 
-  it('uses cork palette with red investigation strings and filler styles', async () => {
-    const css = await readSource('../src/styles/pages.css');
-    expect(css).toMatch(/\.corkboard-page\s*\{[^}]*background:\s*transparent/i);
-    expect(css).toMatch(/\.corkboard-board\s*\{[\s\S]*?border:\s*14px solid var\(--tobacco-oak\)/i);
-    expect(css).toMatch(/\.corkboard-strings path\s*\{[^}]*stroke:\s*var\(--clay\)/i);
-    expect(css).toContain('.board-filler');
-    expect(css).toMatch(/\.board-note--sticky\s*\{[^}]*#f1e6d0/i);
-    expect(css).toMatch(/\.board-note--ruled\s*\{[\s\S]*?#b7c7d6/i);
-    expect(css).toMatch(/\.board-note--polaroid\s*\{[^}]*#a9c2b3/i);
+  it('lifts only the hovered featured sheet', () => {
+    vi.stubGlobal('window', { matchMedia: () => ({ matches: true }) });
+    const board = createCorkboard();
+    board.setFeatured(ENTRIES);
+    const [first, second] = board.featured;
+    board.setHovered('a');
+    expect(first.position.z).toBeGreaterThan(first.userData.baseZ);
+    expect(second.position.z).toBe(second.userData.baseZ);
+    board.setHovered(null);
+    expect(first.position.z).toBe(first.userData.baseZ);
   });
 });
 
