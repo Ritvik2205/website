@@ -79,9 +79,16 @@ function fakeElement(tagName) {
     children: [],
     dataset: {},
     parentNode: null,
+    hidden: false,
+    textContent: '',
+    style: {},
+    attributes: new Map(),
     set innerHTML(value) { html = value; },
     get innerHTML() { return html; },
     get firstElementChild() { return this.children[0] ?? null; },
+    setAttribute(name, value) { this.attributes.set(name, String(value)); },
+    getAttribute(name) { return this.attributes.get(name) ?? null; },
+    removeAttribute(name) { this.attributes.delete(name); },
     appendChild(child) {
       child.parentNode = this;
       this.children.push(child);
@@ -112,24 +119,37 @@ function fakeElement(tagName) {
       handlers.push(listener);
       listeners.set(type, handlers);
     },
-    click() {
-      for (const listener of listeners.get('click') ?? []) listener();
+    dispatchEvent(event) {
+      for (const listener of listeners.get(event.type) ?? []) listener(event);
     },
+    click() {
+      this.dispatchEvent({ type: 'click', preventDefault: vi.fn(), stopPropagation: vi.fn() });
+    },
+    focus: vi.fn(),
+    showModal() { this.open = true; },
+    close() { this.open = false; },
     querySelector(selector) {
-      if (!selectors.has(selector)) selectors.set(selector, fakeElement('div'));
-      return selectors.get(selector);
+      const match = this.querySelectorAll(selector)[0];
+      if (match) return match;
+      if (selector === '.vinyl-disc') {
+        if (!selectors.has(selector)) selectors.set(selector, fakeElement('div'));
+        return selectors.get(selector);
+      }
+      return null;
     },
     querySelectorAll(selector) {
-      if (selector !== '.post-link') return [];
-      if (!selectors.has(selector)) {
-        const buttons = [...html.matchAll(/data-index="(\d+)"/g)].map((match) => {
-          const button = fakeElement('button');
-          button.dataset.index = match[1];
-          return button;
-        });
-        selectors.set(selector, buttons);
-      }
-      return selectors.get(selector);
+      const matches = [];
+      const selectorClass = selector.startsWith('.') ? selector.slice(1) : null;
+      const selectorRole = selector.match(/^\[role="(.+)"\]$/)?.[1];
+      const visit = (node) => {
+        if (
+          (selectorClass && node.className.split(' ').includes(selectorClass))
+          || (selectorRole && node.getAttribute('role') === selectorRole)
+        ) matches.push(node);
+        node.children.forEach(visit);
+      };
+      this.children.forEach(visit);
+      return matches;
     },
   };
 
@@ -139,6 +159,7 @@ function fakeElement(tagName) {
 function stubPageDocument() {
   vi.stubGlobal('document', {
     createElement: vi.fn((tagName) => fakeElement(tagName)),
+    createElementNS: vi.fn((_namespace, tagName) => fakeElement(tagName)),
   });
 }
 
@@ -300,49 +321,59 @@ describe('reduced-motion page behavior', () => {
     expect(kill).toHaveBeenCalledOnce();
   });
 
-  it('replaces blog pages synchronously without GSAP under reduced motion', () => {
+  it('renders journal stations and opens an article modal without animation under reduced motion', () => {
     stubPageDocument();
     stubMotionPreference(true);
-    const el = createBlogPage([
+    const { el, hooks } = createBlogPage([
       { title: 'Rain notes', date: '2026-07-21', body: 'Post body.' },
     ]);
-    const pages = el.children[0].querySelector('.binder-pages');
-    const index = pages.firstElementChild;
+    const station = el.querySelector('.journal-station');
+    const modal = el.querySelector('.journal-article-modal');
 
-    index.querySelectorAll('.post-link')[0].click();
-    const post = pages.firstElementChild;
+    expect(el.querySelector('.journal-map')).toBeTruthy();
+    expect(station.querySelector('.journal-station-title').textContent).toContain('Rain notes');
+    expect(modal.hidden).toBe(true);
 
-    expect(post).not.toBe(index);
-    expect(pages.children).toHaveLength(1);
-    expect(gsap.set).not.toHaveBeenCalled();
+    station.click();
+    expect(modal.hidden).toBe(false);
+    expect(modal.open).toBe(true);
+    expect(modal.querySelector('.journal-article-body').innerHTML).toContain('Post body.');
+    expect(modal.querySelector('.journal-article-close').focus).toHaveBeenCalledOnce();
+    const escape = { type: 'keydown', key: 'Escape', preventDefault: vi.fn(), stopPropagation: vi.fn() };
+    modal.dispatchEvent(escape);
+    expect(station.focus).toHaveBeenCalledOnce();
+    expect(escape.stopPropagation).toHaveBeenCalledOnce();
+
+    hooks.onOpen();
     expect(gsap.to).not.toHaveBeenCalled();
-
-    post.querySelector('.post-back').click();
-    expect(pages.children).toHaveLength(1);
-    expect(pages.firstElementChild).not.toBe(post);
   });
 
-  it('preserves the existing GSAP blog flip in normal motion', () => {
+  it('animates the coaster car only while the journal is open in normal motion', () => {
     stubPageDocument();
     stubMotionPreference(false);
-    const el = createBlogPage([
+    const kill = vi.fn();
+    gsap.to.mockReturnValue({ kill });
+    const { el, hooks } = createBlogPage([
       { title: 'Rain notes', date: '2026-07-21', body: 'Post body.' },
     ]);
-    const pages = el.children[0].querySelector('.binder-pages');
-    const index = pages.firstElementChild;
 
-    index.querySelectorAll('.post-link')[0].click();
+    hooks.onOpen();
 
-    expect(gsap.set).toHaveBeenCalledTimes(2);
-    expect(gsap.to).toHaveBeenCalledWith(index, expect.objectContaining({
-      rotationY: -180,
-      duration: 0.8,
-      ease: 'power2.inOut',
-      onComplete: expect.any(Function),
+    expect(gsap.to).toHaveBeenCalledWith(expect.any(Object), expect.objectContaining({
+      onUpdate: expect.any(Function),
+      duration: 3.2,
+      ease: 'power1.inOut',
     }));
-    expect(pages.children).toHaveLength(2);
+    hooks.onClose();
+    expect(kill).toHaveBeenCalledOnce();
+  });
 
-    gsap.to.mock.calls[0][1].onComplete();
-    expect(pages.children).toHaveLength(1);
+  it('shows a journal empty state when no posts are loaded', () => {
+    stubPageDocument();
+    stubMotionPreference(true);
+
+    const { el } = createBlogPage([]);
+
+    expect(el.querySelector('.journal-empty')).toBeTruthy();
   });
 });

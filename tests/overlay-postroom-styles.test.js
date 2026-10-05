@@ -41,7 +41,7 @@ describe('Monsoon Postroom shared typography', () => {
     expect(css).toMatch(/\.window-title\s*\{[^}]*var\(--font-display\)/s);
     expect(css).toMatch(/\.route-mark\s*\{[^}]*var\(--font-mono\)/s);
     expect(css).toMatch(/\.gallery-caption\s*\{[^}]*var\(--font-hand\)/s);
-    expect(css).toMatch(/\.post-body\s*\{[^}]*var\(--font-display\)/s);
+    expect(css).toMatch(/\.journal-article-body\s*\{[^}]*var\(--font-display\)/s);
   });
 });
 
@@ -86,15 +86,18 @@ describe('Monsoon Postroom page and overlay color contracts', () => {
     expect(css).toMatch(/\.tech-tag\s*\{[^}]*border-radius:\s*[234]px/s);
   });
 
-  it('uses drawer, contact-sheet, binder, record, and listening-card colors', async () => {
+  it('uses drawer, contact-sheet, descent-map, record, and listening-card colors', async () => {
     const css = await readSource('../src/styles/pages.css');
 
     expect(css).toMatch(/\.gallery-page\s*\{[^}]*background:\s*var\(--storm-ink\)/s);
     expect(css).toMatch(/\.gallery-item--sketch\s*\{[^}]*background:\s*var\(--rag-paper\)/s);
     expect(css).toMatch(/\.gallery-item--photo\s*\{[^}]*background:\s*var\(--tobacco-oak\)/s);
-    expect(css).toMatch(/\.binder\s*\{[^}]*var\(--tobacco-oak\)/s);
-    expect(css).toMatch(/\.ring\s*\{[^}]*border:[^;]*var\(--honey-lamp\)/s);
-    expect(css).toMatch(/\.binder-page\s*\{[^}]*var\(--rag-paper\)/s);
+    expect(css).toMatch(/\.journal-page\s*\{[^}]*background:\s*var\(--storm-ink\)/s);
+    expect(css).toMatch(/\.journal-rail-outer\s*\{[^}]*var\(--rag-paper\)/s);
+    expect(css).toMatch(/\.journal-rail-inner\s*\{[^}]*var\(--honey-lamp\)/s);
+    expect(css).toMatch(/\.journal-station\s*\{[^}]*background:\s*var\(--rag-paper\)/s);
+    expect(css).toMatch(/\.journal-station\s*\{[^}]*position:\s*relative/s);
+    expect(css).toMatch(/@media \(max-width: 700px\)[\s\S]*?\.journal-stations\s*\{[^}]*display:\s*grid/s);
     expect(css).toMatch(/\.vinyl-label\s*\{[^}]*var\(--verdigris\)[^}]*var\(--honey-lamp\)/s);
     expect(css).toMatch(/\.music-panel\s*\{[^}]*background:\s*var\(--rag-paper\)/s);
   });

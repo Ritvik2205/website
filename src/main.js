@@ -97,7 +97,8 @@ engine.onTick((dt) => atmosphere.update(dt));
 const content = await loadContent();
 overlays.register('projects', createProjectsPage(content.projects));
 overlays.register('gallery', createGalleryPage(content.gallery));
-overlays.register('blog', createBlogPage(content.posts));
+const journalPage = createBlogPage(content.posts);
+overlays.register('blog', journalPage.el, journalPage.hooks);
 
 const musicPage = createMusicPage(content.site);
 overlays.register('music', musicPage.el, musicPage.hooks);
