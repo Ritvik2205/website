@@ -226,11 +226,13 @@ describe('Monsoon Postroom remaining procedural props', () => {
   it('uses Tobacco Oak, Rag Paper, and a restrained brass postal mark on the journal', () => {
     const canvases = stubCanvasDocument();
     const { group, id, label } = createJournal();
-    const [cover, top, spine, pages, strap] = group.children;
+    // Procedural journal is the fallback shown until the kit GLB loads.
+    const fallback = group.children[0];
+    const [cover, top, spine, pages, strap] = fallback.children;
 
     expect(id).toBe('blog');
     expect(label).toBe('journal');
-    expect(group.children).toHaveLength(5);
+    expect(fallback.children).toHaveLength(5);
     expect(cover.geometry.parameters).toMatchObject({ width: 0.22, height: 0.05, depth: 0.3 });
     expect(top.geometry.parameters).toMatchObject({ width: 0.22, height: 0.3 });
     expect(spine.geometry.parameters).toMatchObject({ width: 0.03, height: 0.055, depth: 0.3 });
@@ -251,17 +253,18 @@ describe('Monsoon Postroom remaining procedural props', () => {
   it('uses Rag Paper with Verdigris drawing and Verdigris/brass pencils', () => {
     const canvases = stubCanvasDocument();
     const { group, id, label } = createSketchbook();
-    const pages = group.children.filter(
+    const fallback = group.children[0];
+    const pages = fallback.children.filter(
       ({ geometry }) => geometry?.type === 'BoxGeometry'
         && geometry.parameters.width === 0.24,
     );
-    const pencils = group.children.filter(
+    const pencils = fallback.children.filter(
       ({ geometry }) => geometry?.type === 'CylinderGeometry',
     );
 
     expect(id).toBe('gallery');
     expect(label).toBe('sketches & photos');
-    expect(group.children).toHaveLength(6);
+    expect(fallback.children).toHaveLength(6);
     expect(pages).toHaveLength(2);
     expect(pages.every(({ geometry }) => (
       geometry.parameters.height === 0.015 && geometry.parameters.depth === 0.3

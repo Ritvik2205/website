@@ -37,7 +37,8 @@ function prepareGroup(root, { height = 1, castShadow = true, receiveShadow = tru
   const box = new THREE.Box3().setFromObject(root);
   const size = new THREE.Vector3();
   box.getSize(size);
-  if (size.y > 1e-5) {
+  // height: null keeps authored scale (kit GLBs are modeled in meters).
+  if (height && size.y > 1e-5) {
     const scale = height / size.y;
     root.scale.multiplyScalar(scale);
     box.setFromObject(root);
@@ -94,6 +95,29 @@ export function loadModel(url, { height = 0.5, castShadow = true, receiveShadow 
     });
 
   return group;
+}
+
+/**
+ * Group showing `fallback` until the GLB loads, then the model.
+ * `onLoad(model)` runs once with the loaded model group.
+ */
+export function withFallback(url, fallback, { height = null, onLoad } = {}) {
+  const wrap = new THREE.Group();
+  wrap.add(fallback);
+  const model = loadModel(url, { height });
+  model.visible = false;
+  wrap.add(model);
+  const poll = () => {
+    if (model.userData.assetStatus === 'loaded') {
+      fallback.visible = false;
+      model.visible = true;
+      onLoad?.(model);
+    } else if (model.userData.assetStatus !== 'error') {
+      nextFrame(poll);
+    }
+  };
+  nextFrame(poll);
+  return wrap;
 }
 
 /** Awaitable variant for composition roots that prefer sequential setup. */

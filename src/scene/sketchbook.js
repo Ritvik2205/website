@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { markShadowCasters } from '../render/loadModel.js';
+import { markShadowCasters, withFallback } from '../render/loadModel.js';
 import { LAYOUT, applyPose } from './layout.js';
 
 function makeSketchTexture() {
@@ -31,7 +31,8 @@ function makeSketchTexture() {
 }
 
 export function createSketchbook() {
-  const group = new THREE.Group();
+  const fallback = new THREE.Group();
+  const sketch = makeSketchTexture();
   const paper = new THREE.MeshStandardMaterial({
     color: 0xe7dec9,
     roughness: 0.88,
@@ -39,7 +40,7 @@ export function createSketchbook() {
   });
 
   const leftPage = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.015, 0.3), paper.clone());
-  leftPage.material.map = makeSketchTexture();
+  leftPage.material.map = sketch;
   leftPage.material.needsUpdate = true;
   leftPage.position.set(-0.12, 0.012, 0);
   leftPage.rotation.z = 0.06;
@@ -69,10 +70,23 @@ export function createSketchbook() {
     pencil.rotation.y = 0.5 + i * 0.15;
     pencil.position.set(0.18, 0.008, 0.08 + i * 0.025);
     pencil.castShadow = true;
-    group.add(pencil);
+    fallback.add(pencil);
   });
 
-  group.add(leftPage, rightPage, spine);
+  fallback.add(leftPage, rightPage, spine);
+
+  const group = withFallback('/models/kit/sketchbook.glb', fallback, {
+    onLoad: (model) => {
+      const page = model.getObjectByName('PageLeft');
+      if (!page) return;
+      // glTF UVs expect flipY = false; clone so the fallback keeps its orientation.
+      const map = sketch.clone();
+      map.flipY = false;
+      map.needsUpdate = true;
+      page.material = new THREE.MeshStandardMaterial({ map, roughness: 0.85 });
+      page.receiveShadow = true;
+    },
+  });
   markShadowCasters(group);
   applyPose(group, LAYOUT.sketchbook);
   return { group, id: 'gallery', label: 'sketches & photos' };

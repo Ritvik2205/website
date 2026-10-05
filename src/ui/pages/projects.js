@@ -5,6 +5,7 @@ export function createProjectsPage(projects) {
   const heading = document.createElement('h1');
   heading.className = 'page-heading page-heading--mono';
   heading.textContent = 'PROJECT ROUTING DESK';
+  heading.setAttribute('data-reveal', '');
   el.appendChild(heading);
 
   const grid = document.createElement('div');
@@ -14,6 +15,7 @@ export function createProjectsPage(projects) {
   projects.forEach((p, i) => {
     const win = document.createElement('article');
     win.className = 'project-window';
+    win.setAttribute('data-reveal', '');
     win.style.setProperty('--scatter-rot', `${[-1.2, 0.8, -0.6, 1.4][i % 4]}deg`);
     win.style.setProperty('--scatter-y', `${[0, 18, 6, 24][i % 4]}px`);
 

@@ -5,12 +5,12 @@ export function createMusicPage(site) {
   const el = document.createElement('div');
   el.className = 'music-page';
   el.innerHTML = `
-    <div class="music-vinyl">
+    <div class="music-vinyl" data-reveal>
       <div class="vinyl-disc">
         <div class="vinyl-label"><span>Ritvik's<br>rotation</span></div>
       </div>
     </div>
-    <div class="music-panel">
+    <div class="music-panel" data-reveal>
       <h1 class="page-heading">now spinning</h1>
       <iframe
         class="spotify-embed"

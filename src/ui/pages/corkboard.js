@@ -18,6 +18,7 @@ export function createCorkboardPage(experience) {
 
   const board = document.createElement('div');
   board.className = 'corkboard-board';
+  board.setAttribute('data-reveal', '');
   el.appendChild(board);
 
   const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');

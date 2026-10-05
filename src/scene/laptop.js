@@ -84,7 +84,7 @@ export function createLaptop() {
   const { group: fallback, screen } = createFallback(screenMaterial);
   group.add(fallback);
 
-  const model = loadModel('/models/laptop.glb', { height: 0.28 });
+  const model = loadModel('/models/kit/laptop.glb', { height: null });
   model.visible = false;
   group.add(model);
 
@@ -92,9 +92,13 @@ export function createLaptop() {
     if (model.userData.assetStatus === 'loaded') {
       fallback.visible = false;
       model.visible = true;
-      // Keep glowing screen as child of root so it still updates
-      screen.position.set(0, 0.16, -0.05);
-      group.add(screen);
+      // Kit laptop exposes a UV-mapped `Screen` plane; glTF UVs expect flipY = false.
+      const kitScreen = model.getObjectByName('Screen');
+      if (kitScreen) {
+        screenTexture.flipY = false;
+        screenTexture.needsUpdate = true;
+        kitScreen.material = screenMaterial;
+      }
     } else if (model.userData.assetStatus === 'error') {
       model.visible = false;
       fallback.visible = true;

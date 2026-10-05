@@ -42,6 +42,7 @@ export function createBlogPage(posts) {
   el.className = 'journal-page';
 
   const title = addElement(el, 'header', 'journal-heading');
+  title.setAttribute('data-reveal', '');
   addElement(title, 'p', 'journal-kicker', 'journal / descent map');
   addElement(title, 'h1', 'journal-title', 'take the long way down');
 

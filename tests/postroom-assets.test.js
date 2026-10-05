@@ -2,42 +2,34 @@ import { access, readFile } from 'node:fs/promises';
 import { describe, expect, it } from 'vitest';
 
 const models = [
+  'desk.glb',
   'laptop.glb',
   'lamp.glb',
+  'vinyl.glb',
+  'sketchbook.glb',
+  'journal.glb',
+  'teacup.glb',
   'books.glb',
   'plant.glb',
-  'potted-plant.glb',
-  'vinyl-player.glb',
+  'pencup.glb',
   'keyboard.glb',
 ];
 
-const textures = [
-  'wood-color.jpg',
-  'wood-roughness.jpg',
-  'wood-normal.jpg',
-  'wood-ao.jpg',
-  'plaster-color.jpg',
-  'plaster-roughness.jpg',
-  'plaster-normal.jpg',
-  'storm-sky.jpg',
-];
+const textures = ['storm-sky.jpg'];
 
-describe('Realtime PBR desk assets', () => {
-  it('documents Kenney and ambientCG attribution', async () => {
+describe('Soft stylized desk assets', () => {
+  it('documents the generated kit and Poly Haven sky', async () => {
     const attribution = await readFile(
       new URL('../public/models/ATTRIBUTION.md', import.meta.url),
       'utf8',
     );
-    expect(attribution).toContain('Kenney');
-    expect(attribution).toContain('ambientCG');
+    expect(attribution).toContain('tools/blender/desk_kit.py');
     expect(attribution).toContain('Poly Haven');
-    expect(attribution).toContain('vinyl-player.glb');
     expect(attribution).toContain('CC0');
-    expect(attribution).toMatch(/CC Attribution|CC-BY/i);
   });
 
-  it.each(models)('%s exists under public/models', async (name) => {
-    const url = new URL(`../public/models/${name}`, import.meta.url);
+  it.each(models)('%s exists under public/models/kit', async (name) => {
+    const url = new URL(`../public/models/kit/${name}`, import.meta.url);
     await access(url);
     const bytes = await readFile(url);
     expect(bytes.byteLength).toBeGreaterThan(500);

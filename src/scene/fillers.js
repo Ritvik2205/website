@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { loadModel, markShadowCasters, nextFrame } from '../render/loadModel.js';
+import { markShadowCasters, withFallback } from '../render/loadModel.js';
 import { LAYOUT, applyPose } from './layout.js';
 
 function paperSheet(w, h, color) {
@@ -105,37 +105,16 @@ function createKeyboardFallback() {
   return g;
 }
 
-function withGlbOrFallback(url, height, fallback) {
-  const wrap = new THREE.Group();
-  wrap.add(fallback);
-  const model = loadModel(url, { height });
-  model.visible = false;
-  wrap.add(model);
-  const poll = () => {
-    if (model.userData.assetStatus === 'loaded') {
-      fallback.visible = false;
-      model.visible = true;
-    } else if (model.userData.assetStatus === 'error') {
-      model.visible = false;
-      fallback.visible = true;
-    } else {
-      nextFrame(poll);
-    }
-  };
-  nextFrame(poll);
-  return wrap;
-}
-
 /** Non-interactive desk clutter to fill negative space. */
 export function createFillers() {
   const group = new THREE.Group();
   const poses = LAYOUT.fillers;
 
-  const books = withGlbOrFallback('/models/books.glb', 0.16, createBooksFallback());
+  const books = withFallback('/models/kit/books.glb', createBooksFallback());
   applyPose(books, poses.books);
   group.add(books);
 
-  const plant = withGlbOrFallback('/models/potted-plant.glb', 0.42, createPlantFallback());
+  const plant = withFallback('/models/kit/plant.glb', createPlantFallback());
   applyPose(plant, poses.plant);
   group.add(plant);
 
@@ -143,11 +122,11 @@ export function createFillers() {
   applyPose(papers, poses.papers);
   group.add(papers);
 
-  const penCup = createPenCup();
+  const penCup = withFallback('/models/kit/pencup.glb', createPenCup());
   applyPose(penCup, poses.penCup);
   group.add(penCup);
 
-  const keyboard = withGlbOrFallback('/models/keyboard.glb', 0.035, createKeyboardFallback());
+  const keyboard = withFallback('/models/kit/keyboard.glb', createKeyboardFallback());
   applyPose(keyboard, poses.keyboard);
   group.add(keyboard);
 

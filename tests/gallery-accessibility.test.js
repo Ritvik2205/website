@@ -22,6 +22,7 @@ function fakeElement(tagName) {
       contains: (name) => classes.has(name),
     },
     appendChild(child) { this.children.push(child); },
+    setAttribute() {},
     addEventListener(type, listener) {
       const handlers = listeners.get(type) ?? [];
       handlers.push(listener);

@@ -1,63 +1,19 @@
 import * as THREE from 'three';
+import { withFallback } from '../render/loadModel.js';
 
-const loader = new THREE.TextureLoader();
-
-function loadMap(url, { colorSpace = THREE.SRGBColorSpace, wrap = true } = {}) {
-  if (typeof document === 'undefined') {
-    const map = new THREE.Texture();
-    map.colorSpace = colorSpace;
-    return map;
-  }
-  const map = loader.load(url);
-  map.colorSpace = colorSpace;
-  if (wrap) {
-    map.wrapS = map.wrapT = THREE.RepeatWrapping;
-  }
-  return map;
-}
-
-function woodMaterial({ repeat = [2.2, 1.2] } = {}) {
-  const map = loadMap('/textures/wood-color.jpg');
-  const roughnessMap = loadMap('/textures/wood-roughness.jpg', { colorSpace: THREE.NoColorSpace });
-  const normalMap = loadMap('/textures/wood-normal.jpg', { colorSpace: THREE.NoColorSpace });
-  const aoMap = loadMap('/textures/wood-ao.jpg', { colorSpace: THREE.NoColorSpace });
-  for (const t of [map, roughnessMap, normalMap, aoMap]) {
-    t.repeat.set(repeat[0], repeat[1]);
-  }
-  return new THREE.MeshStandardMaterial({
-    map,
-    roughnessMap,
-    normalMap,
-    aoMap,
-    roughness: 0.85,
-    metalness: 0.04,
-    color: 0xffffff,
-  });
-}
-
-function plasterMaterial() {
-  const map = loadMap('/textures/plaster-color.jpg');
-  const roughnessMap = loadMap('/textures/plaster-roughness.jpg', { colorSpace: THREE.NoColorSpace });
-  const normalMap = loadMap('/textures/plaster-normal.jpg', { colorSpace: THREE.NoColorSpace });
-  for (const t of [map, roughnessMap, normalMap]) {
-    t.repeat.set(3.5, 1.8);
-  }
-  return new THREE.MeshStandardMaterial({
-    map,
-    roughnessMap,
-    normalMap,
-    roughness: 0.92,
-    metalness: 0.02,
-    color: 0xc4b49a,
-  });
-}
+// Soft stylized palette (docs/superpowers/specs/2026-10-05-soft-stylized-art-direction-design.md)
+const OAK = 0xb9805a;
+const OAK_DEEP = 0x7c5236;
+const SLATE = 0x33435a;
+const NIGHT = 0x12161e;
 
 export function createEnvironment() {
   const group = new THREE.Group();
-  const deskMat = woodMaterial({ repeat: [2.4, 1.1] });
-  const edgeMat = woodMaterial({ repeat: [2.4, 0.2] });
-  edgeMat.color = new THREE.Color(0xb8956a);
-  const wallMat = plasterMaterial();
+  const deskMat = new THREE.MeshStandardMaterial({ color: OAK, roughness: 0.62, metalness: 0 });
+  const edgeMat = new THREE.MeshStandardMaterial({ color: OAK_DEEP, roughness: 0.7, metalness: 0 });
+  const wallMat = new THREE.MeshStandardMaterial({ color: SLATE, roughness: 0.92, metalness: 0 });
+  // Procedural desk boxes stay as the fallback until the beveled kit desk loads.
+  const deskFallback = new THREE.Group();
 
   const deskBody = new THREE.Mesh(
     new THREE.BoxGeometry(3.0, 0.09, 1.05),
@@ -66,7 +22,7 @@ export function createEnvironment() {
   deskBody.position.set(0, 0.375, -0.675);
   deskBody.castShadow = true;
   deskBody.receiveShadow = true;
-  group.add(deskBody);
+  deskFallback.add(deskBody);
 
   const deskTop = new THREE.Mesh(
     new THREE.BoxGeometry(3.0, 0.04, 1.05),
@@ -76,10 +32,7 @@ export function createEnvironment() {
   deskTop.position.set(0, 0.42, -0.675);
   deskTop.castShadow = true;
   deskTop.receiveShadow = true;
-  // aoMap needs a second UV set; duplicate uv -> uv2
-  deskTop.geometry.setAttribute('uv2', deskTop.geometry.attributes.uv);
-  deskBody.geometry.setAttribute('uv2', deskBody.geometry.attributes.uv);
-  group.add(deskTop);
+  deskFallback.add(deskTop);
 
   const deskEdge = new THREE.Mesh(
     new THREE.BoxGeometry(3.0, 0.18, 0.07),
@@ -88,12 +41,17 @@ export function createEnvironment() {
   deskEdge.position.set(0, 0.33, -0.15);
   deskEdge.castShadow = true;
   deskEdge.receiveShadow = true;
-  group.add(deskEdge);
+  deskFallback.add(deskEdge);
+
+  const desk = withFallback('/models/kit/desk.glb', deskFallback);
+  // Kit desk is authored centered; the fallback boxes already sit in world space.
+  desk.children[1].position.set(0, 0, -0.675);
+  group.add(desk);
 
   const floor = new THREE.Mesh(
     new THREE.PlaneGeometry(10, 10),
     new THREE.MeshStandardMaterial({
-      color: 0x1a1f28,
+      color: NIGHT,
       roughness: 0.95,
       metalness: 0.05,
     }),
@@ -128,18 +86,6 @@ export function createEnvironment() {
   wallShape.holes.push(windowHole);
 
   const wallGeometry = new THREE.ShapeGeometry(wallShape);
-  // ShapeGeometry emits raw world-space UVs; remap to 0-1 so wallMat's
-  // texture repeat/tiling matches what the original PlaneGeometry produced.
-  const wallUv = wallGeometry.attributes.uv;
-  for (let i = 0; i < wallUv.count; i++) {
-    wallUv.setXY(
-      i,
-      (wallUv.getX(i) + wallWidth / 2) / wallWidth,
-      (wallUv.getY(i) + wallHeight / 2) / wallHeight,
-    );
-  }
-  wallUv.needsUpdate = true;
-
   const wall = new THREE.Mesh(wallGeometry, wallMat);
   wall.position.set(0, 2.5, -1.2);
   wall.receiveShadow = true;
@@ -148,7 +94,7 @@ export function createEnvironment() {
   // Four bars rather than a solid box, so the frame surrounds the wall hole
   // instead of plugging it. Inner opening matches windowOpeningWidth/Height;
   // outer extent stays 0.7 x 0.9 with a 0.04 jamb on every side.
-  const frameMat = new THREE.MeshStandardMaterial({ color: 0x493522, roughness: 0.7, metalness: 0.1 });
+  const frameMat = new THREE.MeshStandardMaterial({ color: OAK_DEEP, roughness: 0.7, metalness: 0 });
   const frameDepth = 0.04;
   const jamb = 0.04;
   const frameZ = -1.19;
@@ -164,6 +110,7 @@ export function createEnvironment() {
   ];
   for (const [w, h, x, y] of frameBars) {
     const bar = new THREE.Mesh(new THREE.BoxGeometry(w, h, frameDepth), frameMat);
+    bar.name = 'windowFrameBar';
     bar.position.set(x, y, frameZ);
     bar.castShadow = true;
     bar.receiveShadow = true;
@@ -188,7 +135,7 @@ export function createEnvironment() {
   group.add(windowPane);
 
   // Simple mullion bars for window-shadow character
-  const mullionMat = new THREE.MeshStandardMaterial({ color: 0x3a2a1c, roughness: 0.8 });
+  const mullionMat = new THREE.MeshStandardMaterial({ color: 0x6a4630, roughness: 0.8 });
   const mullionV = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.82, 0.03), mullionMat);
   mullionV.position.set(2.2, 1.8, -1.17);
   const mullionH = new THREE.Mesh(new THREE.BoxGeometry(0.62, 0.04, 0.03), mullionMat);

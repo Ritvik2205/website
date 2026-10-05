@@ -24,6 +24,7 @@ export function createGalleryPage(gallery) {
     const itemButton = document.createElement('button');
     itemButton.type = 'button';
     itemButton.className = `gallery-item gallery-item--${item.type}`;
+    itemButton.setAttribute('data-reveal', '');
     itemButton.innerHTML = `
       <img src="${item.src}" alt="" loading="lazy" />
       <span class="gallery-caption">${item.caption}</span>`;

@@ -44,7 +44,7 @@ export function createVinyl() {
   const fallback = createFallback();
   group.add(fallback);
 
-  const player = loadModel('/models/vinyl-player.glb', { height: 0.32 });
+  const player = loadModel('/models/kit/vinyl.glb', { height: null });
   player.visible = false;
   group.add(player);
 
@@ -55,14 +55,8 @@ export function createVinyl() {
     if (player.userData.assetStatus === 'loaded') {
       fallback.visible = false;
       player.visible = true;
-      // Only spin a mesh that is clearly the record/platter — never the whole deck.
-      let best = null;
-      player.traverse((o) => {
-        if (!o.isMesh) return;
-        const name = (o.name || '').toLowerCase();
-        if (/platter|disc|record|vinyl/.test(name)) best = o;
-      });
-      platter = best;
+      // Kit `Platter` carries the record and label as children; never spin the deck.
+      platter = player.getObjectByName('Platter');
     } else if (player.userData.assetStatus === 'error') {
       player.visible = false;
       fallback.visible = true;

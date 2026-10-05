@@ -99,9 +99,10 @@ function applyMood(t) {
     );
   }
 
-  hemiLight.intensity = THREE.MathUtils.lerp(0.35, 0.65, warm);
-  hemiLight.color.setHex(warm > 0.4 ? 0xffe2b8 : 0xc5d4e0);
-  hemiLight.groundColor.setHex(warm > 0.4 ? 0x3a2a1c : 0x1e2834);
+  // Stylized look: generous sky fill so shadows read soft blue, never black.
+  hemiLight.intensity = THREE.MathUtils.lerp(0.9, 1.35, warm);
+  hemiLight.color.setHex(warm > 0.4 ? 0xd9dcf0 : 0xb4c4e0);
+  hemiLight.groundColor.setHex(warm > 0.4 ? 0x4a3a30 : 0x26324a);
 }
 
 export function setLampMood(value) {

@@ -1,6 +1,6 @@
 .page-heading {
-  font: 600 2.75rem/1 var(--font-display); color: var(--rag-paper);
-  margin: 0 0 28px; text-align: center; letter-spacing: -.02em;
+  font: 600 clamp(2.4rem, 5vw, 3.75rem)/1 var(--font-display); color: var(--rag-paper);
+  margin: 0 0 32px; text-align: center; letter-spacing: -.03em;
 }
 .page-heading--mono {
   font-size: 2rem; letter-spacing: .055em; text-transform: uppercase;
@@ -9,15 +9,15 @@
 /* ---- projects ---- */
 .projects-desktop {
   min-height: 100vh; padding: 90px 48px 60px;
-  background: var(--storm-ink); font-family: var(--font-display);
+  background: transparent; font-family: var(--font-display);
 }
 .projects-grid {
   display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   gap: 36px; max-width: 1100px; margin: 0 auto;
 }
 .project-window {
-  background: var(--rag-paper); border: 1px solid var(--tobacco-oak); border-radius: 3px;
-  overflow: hidden; box-shadow: 0 12px 40px rgba(0,0,0,.5);
+  background: var(--rag-paper); border: 1px solid var(--hairline); border-radius: var(--radius);
+  overflow: hidden; box-shadow: 0 18px 50px rgba(0,0,0,.4);
   transform: rotate(var(--scatter-rot, 0)) translateY(var(--scatter-y, 0));
   transition: transform .25s, box-shadow .25s, border-color .25s;
 }
@@ -63,7 +63,7 @@
 }
 
 /* ---- gallery ---- */
-.gallery-page { height: 100vh; background: var(--storm-ink); outline: none; }
+.gallery-page { height: 100vh; background: transparent; outline: none; }
 .gallery-strip {
   display: flex; align-items: center; gap: 60px; height: 100%;
   overflow-x: auto; overflow-y: hidden; padding: 0 12vw;
@@ -110,7 +110,7 @@
 /* ---- journal descent map ---- */
 .journal-page {
   min-height: 100vh; overflow: auto; position: relative; isolation: isolate;
-  padding: 92px 20px 48px; color: var(--rag-paper); background: var(--storm-ink);
+  padding: 92px 20px 48px; color: var(--rag-paper); background: transparent;
   background-image: radial-gradient(circle at 50% 44%, rgba(104,129,120,.2), transparent 31rem);
 }
 .journal-heading { width: min(940px, 100%); margin: 0 auto -38px; position: relative; z-index: 2; pointer-events: none; }
@@ -168,9 +168,7 @@
 .music-page {
   min-height: 100vh; display: flex; align-items: center; justify-content: center;
   gap: 72px; flex-wrap: wrap;
-  background:
-    linear-gradient(90deg, rgba(23, 27, 34, .78), rgba(23, 27, 34, .44)),
-    repeating-linear-gradient(90deg, #4f3424 0, #4f3424 10px, var(--tobacco-oak) 11px, #5d3e2a 22px);
+  background: transparent;
   padding: 90px 40px 50px;
 }
 .music-vinyl { flex: none; }
@@ -198,11 +196,11 @@
 }
 .music-panel {
   display: flex; flex-direction: column; align-items: center; gap: 18px;
-  background: var(--rag-paper); border: 1px solid var(--tobacco-oak); border-radius: 4px;
-  padding: 24px; box-shadow: 0 22px 58px rgba(0,0,0,.5);
+  background: var(--rag-paper); border: 1px solid var(--hairline); border-radius: var(--radius);
+  padding: 24px; box-shadow: 0 22px 58px rgba(0,0,0,.4);
 }
 .music-panel .page-heading { margin: 0; color: var(--tobacco-oak); }
-.spotify-embed { border-radius: 3px; border: 1px solid var(--rain-slate); max-width: 90vw; }
+.spotify-embed { border-radius: 12px; border: 1px solid var(--rain-slate); max-width: 90vw; }
 .spotify-link {
   color: var(--tobacco-oak); font: 700 .75rem/1.4 var(--font-mono);
   text-underline-offset: 3px;
@@ -213,11 +211,11 @@
 }
 
 /* ---- corkboard ---- */
-.corkboard-page { min-height: 100vh; background: #171b22; padding: 76px 40px 46px; }
+.corkboard-page { min-height: 100vh; background: transparent; padding: 76px 40px 46px; }
 .corkboard-board {
   position: relative; max-width: 1150px; height: calc(100vh - 130px); min-height: 480px;
-  margin: 0 auto; border: 14px solid #604127; border-radius: 6px;
-  background-color: #8a6948;
+  margin: 0 auto; border: 14px solid var(--tobacco-oak); border-radius: var(--radius);
+  background-color: #b88d62;
   background-image:
     radial-gradient(rgba(0,0,0,.16) 1px, transparent 1.5px),
     radial-gradient(rgba(255,255,255,.04) 1px, transparent 1.5px);
@@ -231,32 +229,34 @@
   position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 4;
 }
 .corkboard-strings path {
-  fill: none; stroke: #c41e2a; stroke-width: 2.2; opacity: .9;
+  fill: none; stroke: var(--clay); stroke-width: 2.2; opacity: .9;
   filter: drop-shadow(0 1px 1px rgba(0,0,0,.45));
 }
 .board-filler {
   position: absolute; z-index: 1; pointer-events: none;
   transform: rotate(var(--note-rot, 0deg));
   box-shadow: 1px 2px 6px rgba(0,0,0,.4);
-  background: #f2efe8;
-  padding: 5% 5% 12%;
+  background: var(--rag-paper);
+  /* Fixed padding: percentages resolve against the board width and swallowed the photo. */
+  padding: 7px 7px 20px;
   box-sizing: border-box;
 }
 .board-filler--scrap {
-  padding: 4%;
-  background: #d8cfc0;
+  padding: 6px;
+  background: #e6d9bf;
 }
 .board-filler-photo {
   display: block; width: 100%; height: 100%;
+  /* Flat palette "photo" matching the 3D board: sun over hills, hue varies per note. */
   background:
-    radial-gradient(circle at 35% 40%, hsl(var(--photo-hue, 210), 8%, 42%), transparent 55%),
-    linear-gradient(155deg, #2a2a2e 0%, #111114 55%, #3a3a40 100%);
-  filter: grayscale(1) contrast(1.05);
+    radial-gradient(circle at 32% 34%, var(--honey-lamp) 0 13%, transparent 14%),
+    linear-gradient(180deg, transparent 62%, rgba(18, 22, 30, .35) 62%),
+    hsl(calc(180 + var(--photo-hue, 210) / 8), 24%, 38%);
 }
 .board-web-pin {
   position: absolute; z-index: 3; width: 9px; height: 9px; border-radius: 50%;
   transform: translate(-50%, -50%);
-  background: radial-gradient(circle at 35% 30%, #4a3a28, #1a140e 70%);
+  background: radial-gradient(circle at 35% 30%, #ffd08a, var(--honey-lamp) 45%, #a8661f 80%);
   box-shadow: 0 1px 2px rgba(0,0,0,.55);
   pointer-events: none;
 }
@@ -270,16 +270,17 @@
   font: 600 18px var(--font-hand); color: #293139;
 }
 .board-note:hover { transform: rotate(0deg) scale(1.04); z-index: 5; box-shadow: 4px 8px 22px rgba(0,0,0,.5); }
-.board-note--sticky { background: #e7dec9; }
+.board-note--sticky { background: #f1e6d0; }
 .board-note--ruled {
-  background: repeating-linear-gradient(#9eb7c3 0, #9eb7c3 19px, #7f9ba8 20px), #9eb7c3;
+  background: repeating-linear-gradient(#b7c7d6 0, #b7c7d6 19px, #9fb2c4 20px), #b7c7d6;
   background-position: 0 6px, 0 0;
 }
-.board-note--polaroid { background: #8fa49c; padding: 10px 10px 8px; text-align: center; }
+.board-note--polaroid { background: #a9c2b3; padding: 10px 10px 8px; text-align: center; }
 .polaroid-photo {
   display: block; width: 100%; aspect-ratio: 5 / 4; margin-bottom: 6px;
-  background: linear-gradient(160deg, #334b5f 0%, #171b22 100%);
-  filter: grayscale(0.85);
+  background:
+    radial-gradient(circle at 70% 30%, var(--honey-lamp) 0 12%, transparent 13%),
+    linear-gradient(180deg, var(--rain-slate) 0 64%, #5f7d6b 64%);
 }
 .note-route {
   display: block; margin-bottom: 4px;
@@ -290,26 +291,27 @@
 .note-pin {
   position: absolute; top: 6px; left: 50%; transform: translateX(-50%);
   width: 11px; height: 11px; border-radius: 50%;
-  background: radial-gradient(circle at 35% 30%, #4a3a28, #1a140e 70%);
+  background: radial-gradient(circle at 35% 30%, #ffd08a, var(--honey-lamp) 45%, #a8661f 80%);
   box-shadow: 0 2px 3px rgba(0,0,0,.5); z-index: 4;
 }
 .board-note--polaroid .note-pin { top: 4px; }
 .board-filler .note-pin { top: 3px; width: 8px; height: 8px; }
 .note-modal {
   position: fixed; inset: 0; display: none; z-index: 20;
-  background: rgba(10, 8, 5, .8);
+  background: var(--glass-strong);
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
   align-items: center; justify-content: center;
 }
 .note-modal.visible { display: flex; }
 .note-modal-card {
   position: relative; width: min(520px, 88vw); padding: 38px 36px 32px;
-  background: #e7dec9; transform: rotate(-1deg);
+  background: #f1e6d0; transform: rotate(-1deg); border-radius: 4px;
   box-shadow: 0 30px 90px rgba(0,0,0,.7);
 }
 .note-modal-card[data-type="ruled"] {
-  background: repeating-linear-gradient(#9eb7c3 0, #9eb7c3 25px, #7f9ba8 26px), #9eb7c3;
+  background: repeating-linear-gradient(#b7c7d6 0, #b7c7d6 25px, #9fb2c4 26px), #b7c7d6;
 }
-.note-modal-card[data-type="polaroid"] { background: #8fa49c; }
+.note-modal-card[data-type="polaroid"] { background: #a9c2b3; }
 .note-modal-card h2 { font: 600 34px var(--font-hand); margin: 0 0 12px; color: #293139; }
 .note-modal-card p { font: 400 23px/1.45 var(--font-hand); margin: 0; color: #34423e; }
 .note-modal-close {

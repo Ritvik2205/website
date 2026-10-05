@@ -18,20 +18,21 @@ describe('Monsoon Postroom shared typography', () => {
     // Source assertions are intentional for exact design tokens: Vitest runs in
     // Node without a computed-style engine, while browser checks cover rendering.
     expect(css).toContain(`:root {
-  --storm-ink: #171b22;
-  --rain-slate: #334b5f;
-  --verdigris: #688178;
-  --tobacco-oak: #765137;
-  --honey-lamp: #e1a44b;
-  --rag-paper: #e7dec9;
+  --storm-ink: #12161e;
+  --rain-slate: #33435a;
+  --verdigris: #86a392;
+  --tobacco-oak: #7c5236;
+  --honey-lamp: #f2aa4c;
+  --rag-paper: #f1e6d0;
+  --clay: #cf6f4e;
   --bg: var(--storm-ink);
   --warm: var(--honey-lamp);
   --paper: var(--rag-paper);
-  --ink: #252723;
+  --ink: #1f232a;
   --font-display: 'Newsreader', Georgia, serif;
   --font-hand: 'Caveat', cursive;
   --font-mono: 'Space Mono', monospace;
-}`);
+  --glass: rgba(18, 22, 30, .6);`);
   });
 
   it('assigns display, route, and annotation typography to their intended roles', async () => {
@@ -74,10 +75,10 @@ describe('Monsoon Postroom project routing desk', () => {
 });
 
 describe('Monsoon Postroom page and overlay color contracts', () => {
-  it('styles project files as paper correspondence on a storm surround', async () => {
+  it('styles project files as paper correspondence over the glass overlay', async () => {
     const css = await readSource('../src/styles/pages.css');
 
-    expect(css).toMatch(/\.projects-desktop\s*\{[^}]*background:\s*var\(--storm-ink\)/s);
+    expect(css).toMatch(/\.projects-desktop\s*\{[^}]*background:\s*transparent/s);
     expect(css).toMatch(/\.project-window\s*\{[^}]*background:\s*var\(--rag-paper\)/s);
     expect(css).toMatch(/\.window-titlebar\s*\{[^}]*background:\s*var\(--tobacco-oak\)/s);
     expect(css).toMatch(/\.route-mark\s*\{[^}]*color:\s*var\(--verdigris\)/s);
@@ -89,10 +90,10 @@ describe('Monsoon Postroom page and overlay color contracts', () => {
   it('uses drawer, contact-sheet, descent-map, record, and listening-card colors', async () => {
     const css = await readSource('../src/styles/pages.css');
 
-    expect(css).toMatch(/\.gallery-page\s*\{[^}]*background:\s*var\(--storm-ink\)/s);
+    expect(css).toMatch(/\.gallery-page\s*\{[^}]*background:\s*transparent/s);
     expect(css).toMatch(/\.gallery-item--sketch\s*\{[^}]*background:\s*var\(--rag-paper\)/s);
     expect(css).toMatch(/\.gallery-item--photo\s*\{[^}]*background:\s*var\(--tobacco-oak\)/s);
-    expect(css).toMatch(/\.journal-page\s*\{[^}]*background:\s*var\(--storm-ink\)/s);
+    expect(css).toMatch(/\.journal-page\s*\{[^}]*background:\s*transparent/s);
     expect(css).toMatch(/\.journal-rail-outer\s*\{[^}]*var\(--rag-paper\)/s);
     expect(css).toMatch(/\.journal-rail-inner\s*\{[^}]*var\(--honey-lamp\)/s);
     expect(css).toMatch(/\.journal-station\s*\{[^}]*background:\s*var\(--rag-paper\)/s);
@@ -102,10 +103,11 @@ describe('Monsoon Postroom page and overlay color contracts', () => {
     expect(css).toMatch(/\.music-panel\s*\{[^}]*background:\s*var\(--rag-paper\)/s);
   });
 
-  it('uses translucent rain-slate chrome with paper and honey controls', async () => {
+  it('uses frosted glass chrome with paper and honey controls', async () => {
     const css = await readSource('../src/styles/overlay.css');
 
-    expect(css).toMatch(/\.overlay-page\s*\{[^}]*background:\s*rgba\(51,\s*75,\s*95,[^)]+\)/s);
+    expect(css).toMatch(/\.overlay-page\s*\{[^}]*background:\s*var\(--glass\)/s);
+    expect(css).toMatch(/\.overlay-page\s*\{[^}]*backdrop-filter:\s*blur/s);
     expect(css).toMatch(/\.overlay-back\s*\{[^}]*background:\s*var\(--rag-paper\)/s);
     expect(css).toMatch(/\.overlay-back:hover[\s\S]*?var\(--honey-lamp\)/);
     expect(css).toMatch(/\.overlay-back:focus-visible[\s\S]*?var\(--honey-lamp\)/);

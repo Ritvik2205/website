@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { markShadowCasters } from '../render/loadModel.js';
+import { markShadowCasters, withFallback } from '../render/loadModel.js';
 import { LAYOUT, applyPose } from './layout.js';
 
 function createFallback() {
@@ -28,8 +28,7 @@ function createFallback() {
 }
 
 export function createTeaCup() {
-  const group = new THREE.Group();
-  group.add(createFallback());
+  const group = withFallback('/models/kit/teacup.glb', createFallback());
   markShadowCasters(group);
   applyPose(group, LAYOUT.teaCup);
   return { group };

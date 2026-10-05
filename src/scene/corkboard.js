@@ -12,12 +12,12 @@ import {
 } from './corkboardLayout.js';
 
 const PIN_MAT = new THREE.MeshStandardMaterial({
-  color: 0x2a2218,
-  roughness: 0.45,
-  metalness: 0.55,
+  color: 0xf2aa4c,
+  roughness: 0.4,
+  metalness: 0.4,
 });
 const STRING_MAT = new THREE.LineBasicMaterial({
-  color: 0xc41e2a,
+  color: 0xcf6f4e,
   transparent: true,
   opacity: 0.88,
 });
@@ -44,40 +44,35 @@ function makePhotoTexture(seed, kind) {
     };
   })();
 
-  // Warm cork peeking for scraps; B&W photo for polaroids
+  // Flat palette "photos": a sky band, a sun, and rolling hills; scraps are lined notes.
+  const pick = (list) => list[Math.floor(rnd() * list.length)];
   if (kind === 'scrap') {
-    g.fillStyle = `hsl(${30 + rnd() * 20}, 18%, ${55 + rnd() * 20}%)`;
+    g.fillStyle = '#f1e6d0';
     g.fillRect(0, 0, 128, 160);
-    g.fillStyle = 'rgba(40,30,20,0.35)';
-    for (let i = 0; i < 40; i++) {
-      g.fillRect(rnd() * 128, rnd() * 160, 2 + rnd() * 10, 1 + rnd() * 3);
+    g.strokeStyle = 'rgba(51, 67, 90, 0.35)';
+    g.lineWidth = 3;
+    for (let y = 28; y < 150; y += 18) {
+      g.beginPath();
+      g.moveTo(14, y);
+      g.lineTo(40 + rnd() * 74, y);
+      g.stroke();
     }
   } else {
-    const base = 30 + rnd() * 40;
-    g.fillStyle = `rgb(${base},${base},${base + 8})`;
+    g.fillStyle = pick(['#33435a', '#5f7d6b', '#7c5236', '#86a392']);
     g.fillRect(0, 0, 128, 160);
-    // Soft vignette figure / architecture blobs
-    for (let i = 0; i < 5; i++) {
-      const gx = 20 + rnd() * 90;
-      const gy = 20 + rnd() * 110;
-      const gr = g.createRadialGradient(gx, gy, 4, gx, gy, 20 + rnd() * 40);
-      const c = 20 + rnd() * 90;
-      gr.addColorStop(0, `rgba(${c},${c},${c},0.9)`);
-      gr.addColorStop(1, 'rgba(20,20,24,0)');
-      g.fillStyle = gr;
-      g.fillRect(0, 0, 128, 160);
+    g.fillStyle = pick(['#f2aa4c', '#f1e6d0', '#cf6f4e']);
+    g.beginPath();
+    g.arc(30 + rnd() * 68, 34 + rnd() * 30, 10 + rnd() * 10, 0, Math.PI * 2);
+    g.fill();
+    for (const [color, base] of [['rgba(241, 230, 208, 0.25)', 96], ['rgba(18, 22, 30, 0.35)', 122]]) {
+      g.fillStyle = color;
+      g.beginPath();
+      g.moveTo(0, 160);
+      for (let x = 0; x <= 128; x += 16) g.lineTo(x, base + Math.sin(x * 0.05 + rnd() * 3) * 10);
+      g.lineTo(128, 160);
+      g.fill();
     }
-    // Film grain
-    const img = g.getImageData(0, 0, 128, 160);
-    for (let i = 0; i < img.data.length; i += 4) {
-      const n = (rnd() - 0.5) * 28;
-      img.data[i] = Math.max(0, Math.min(255, img.data[i] + n));
-      img.data[i + 1] = Math.max(0, Math.min(255, img.data[i + 1] + n));
-      img.data[i + 2] = Math.max(0, Math.min(255, img.data[i + 2] + n));
-    }
-    g.putImageData(img, 0, 0);
   }
-
   const tex = new THREE.CanvasTexture(cv);
   tex.colorSpace = THREE.SRGBColorSpace;
   return tex;
@@ -94,7 +89,7 @@ function makePolaroidMesh({ id, kind, left, top, w, h, rot }, z) {
   const frame = new THREE.Mesh(
     new THREE.PlaneGeometry(size.w, size.h),
     new THREE.MeshStandardMaterial({
-      color: kind === 'scrap' ? 0xd8cfc0 : 0xf2efe8,
+      color: kind === 'scrap' ? 0xe6d9bf : 0xf1e6d0,
       roughness: 0.88,
       metalness: 0,
       side: THREE.DoubleSide,
@@ -135,9 +130,9 @@ function makeInteractiveMesh(item, z) {
   group.rotation.z = (item.rot * Math.PI) / 180;
   group.userData.interactiveNote = item.id;
 
-  let color = 0xe7dec9;
-  if (item.kind === 'ruled') color = 0x9eb7c3;
-  if (item.kind === 'polaroid') color = 0x8fa49c;
+  let color = 0xf1e6d0;
+  if (item.kind === 'ruled') color = 0xb7c7d6;
+  if (item.kind === 'polaroid') color = 0xa9c2b3;
 
   const card = new THREE.Mesh(
     new THREE.PlaneGeometry(size.w, size.h),
@@ -200,12 +195,12 @@ export function createCorkboard() {
 
   const board = new THREE.Mesh(
     new THREE.BoxGeometry(2.7, 1.3, 0.04),
-    new THREE.MeshStandardMaterial({ color: 0x8a6948, roughness: 0.92, metalness: 0.0 }),
+    new THREE.MeshStandardMaterial({ color: 0xb88d62, roughness: 0.92, metalness: 0.0 }),
   );
   board.castShadow = true;
   board.receiveShadow = true;
 
-  const frameMat = new THREE.MeshStandardMaterial({ color: 0x604127, roughness: 0.7, metalness: 0.05 });
+  const frameMat = new THREE.MeshStandardMaterial({ color: 0x7c5236, roughness: 0.7, metalness: 0 });
   const frameTop = new THREE.Mesh(new THREE.BoxGeometry(2.86, 0.09, 0.07), frameMat);
   frameTop.position.set(0, 0.695, 0.005);
   frameTop.castShadow = true;

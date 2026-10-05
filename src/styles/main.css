@@ -1,17 +1,23 @@
 :root {
-  --storm-ink: #171b22;
-  --rain-slate: #334b5f;
-  --verdigris: #688178;
-  --tobacco-oak: #765137;
-  --honey-lamp: #e1a44b;
-  --rag-paper: #e7dec9;
+  --storm-ink: #12161e;
+  --rain-slate: #33435a;
+  --verdigris: #86a392;
+  --tobacco-oak: #7c5236;
+  --honey-lamp: #f2aa4c;
+  --rag-paper: #f1e6d0;
+  --clay: #cf6f4e;
   --bg: var(--storm-ink);
   --warm: var(--honey-lamp);
   --paper: var(--rag-paper);
-  --ink: #252723;
+  --ink: #1f232a;
   --font-display: 'Newsreader', Georgia, serif;
   --font-hand: 'Caveat', cursive;
   --font-mono: 'Space Mono', monospace;
+  --glass: rgba(18, 22, 30, .6);
+  --glass-strong: rgba(18, 22, 30, .82);
+  --hairline: rgba(241, 230, 208, .14);
+  --radius: 16px;
+  --ease-out: cubic-bezier(.16, 1, .3, 1);
 }
 * { box-sizing: border-box; }
 html, body { margin: 0; height: 100%; background: var(--bg); overflow: hidden; }

@@ -22,7 +22,15 @@ function stubCanvasDocument() {
       const pixels = new Uint8ClampedArray(128 * 160 * 4);
       const context = {
         fillStyle: '',
+        strokeStyle: '',
+        lineWidth: 1,
         font: '',
+        beginPath: vi.fn(),
+        moveTo: vi.fn(),
+        lineTo: vi.fn(),
+        arc: vi.fn(),
+        fill: vi.fn(),
+        stroke: vi.fn(),
         textAlign: '',
         createLinearGradient: vi.fn(() => ({ addColorStop: vi.fn() })),
         createRadialGradient: vi.fn(() => ({ addColorStop: vi.fn() })),
@@ -69,12 +77,12 @@ describe('Investigation corkboard (3D)', () => {
 
     expect(id).toBe('experience');
     expect(skipHoverVisual).toBe(true);
-    expect(board.material.color.getHex()).toBe(0x8a6948);
+    expect(board.material.color.getHex()).toBe(0xb88d62);
     expect(frames).toHaveLength(4);
     expect(fillerGroups.length).toBeGreaterThanOrEqual(CORK_FILLERS.length);
     expect(interactive).toHaveLength(CORK_INTERACTIVE.length);
     expect(lines.length).toBe(CORK_STRINGS.length);
-    expect(lines.every(({ material }) => material.color.getHex() === 0xc41e2a)).toBe(true);
+    expect(lines.every(({ material }) => material.color.getHex() === 0xcf6f4e)).toBe(true);
   });
 
   it('keeps interactive note ids aligned with experience slots', () => {
@@ -110,13 +118,13 @@ describe('Investigation corkboard (DOM overlay contract)', () => {
 
   it('uses cork palette with red investigation strings and filler styles', async () => {
     const css = await readSource('../src/styles/pages.css');
-    expect(css).toMatch(/\.corkboard-page\s*\{[^}]*background:\s*#171b22/i);
-    expect(css).toMatch(/\.corkboard-board\s*\{[\s\S]*?border:\s*14px solid #604127/i);
-    expect(css).toMatch(/\.corkboard-strings path\s*\{[^}]*stroke:\s*#c41e2a/i);
+    expect(css).toMatch(/\.corkboard-page\s*\{[^}]*background:\s*transparent/i);
+    expect(css).toMatch(/\.corkboard-board\s*\{[\s\S]*?border:\s*14px solid var\(--tobacco-oak\)/i);
+    expect(css).toMatch(/\.corkboard-strings path\s*\{[^}]*stroke:\s*var\(--clay\)/i);
     expect(css).toContain('.board-filler');
-    expect(css).toMatch(/\.board-note--sticky\s*\{[^}]*#e7dec9/i);
-    expect(css).toMatch(/\.board-note--ruled\s*\{[\s\S]*?#9eb7c3/i);
-    expect(css).toMatch(/\.board-note--polaroid\s*\{[^}]*#8fa49c/i);
+    expect(css).toMatch(/\.board-note--sticky\s*\{[^}]*#f1e6d0/i);
+    expect(css).toMatch(/\.board-note--ruled\s*\{[\s\S]*?#b7c7d6/i);
+    expect(css).toMatch(/\.board-note--polaroid\s*\{[^}]*#a9c2b3/i);
   });
 });
 

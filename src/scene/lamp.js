@@ -112,7 +112,8 @@ export function createLamp() {
   const fallback = createFallback(shadeMaterials);
   group.add(fallback);
 
-  const model = loadModel('/models/lamp.glb', { height: 0.62 });
+  const model = loadModel('/models/kit/lamp.glb', { height: null });
+  let bulbMaterial = null;
   model.visible = false;
   group.add(model);
 
@@ -126,7 +127,7 @@ export function createLamp() {
   });
   const glow = new THREE.Mesh(new THREE.PlaneGeometry(0.2, 0.2), glowMaterial);
   glow.position.set(-0.03, 0.48, -0.04);
-  glow.scale.setScalar(0.95);
+  glow.scale.setScalar(0.4);
   group.add(glow);
 
   const poll = () => {
@@ -136,8 +137,10 @@ export function createLamp() {
       // Drop fallback shade mats; replace with GLB shade treatment
       shadeMaterials.length = 0;
       applyTranslucentShade(model, shadeMaterials);
-      // Shade-local offset behind the lamp.glb shade opening.
-      const shadeLocal = new THREE.Vector3(0.09, 0.31, -0.04);
+      bulbMaterial = model.getObjectByName('Bulb')?.material ?? null;
+      if (bulbMaterial) bulbMaterial.userData.onIntensity = bulbMaterial.emissiveIntensity;
+      // Kit lamp bulb sits inside the shade mouth (see tools/blender/desk_kit.py).
+      const shadeLocal = new THREE.Vector3(-0.175, 0.34, 0);
       glow.position.copy(shadeLocal);
       attachLampLight(group, shadeLocal);
     } else if (model.userData.assetStatus === 'error') {
@@ -187,6 +190,13 @@ export function createLamp() {
     });
     gsap.to(glowMaterial, { opacity: on ? 0.95 : 0, duration: 0.4, ease: 'power2.out' });
     setShadeLit(on);
+    if (bulbMaterial) {
+      gsap.to(bulbMaterial, {
+        emissiveIntensity: on ? bulbMaterial.userData.onIntensity : 0,
+        duration: 0.5,
+        ease: 'power2.out',
+      });
+    }
   }
 
   return { group, id: 'lamp', label: 'lights', toggle };

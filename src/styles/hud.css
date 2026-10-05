@@ -1,0 +1,74 @@
+.hud.hidden { pointer-events: none; }
+.hud-id {
+  position: fixed; top: 22px; left: 26px; pointer-events: auto;
+  color: var(--rag-paper); text-shadow: 0 2px 12px rgba(0, 0, 0, .45);
+}
+.hud-id p { margin: 0; }
+.hud-name { font: 600 1.5rem/1.05 var(--font-display); letter-spacing: -.01em; }
+.hud-role {
+  margin-top: 6px !important; color: var(--honey-lamp);
+  font: 700 .6875rem/1.2 var(--font-mono); letter-spacing: .12em; text-transform: uppercase;
+}
+.hud-links { display: flex; gap: 14px; margin-top: 10px !important; }
+.hud-links a {
+  color: var(--rag-paper); opacity: .78; font: 700 .6875rem/1.2 var(--font-mono);
+  text-decoration: none; border-bottom: 1px solid var(--hairline); padding-bottom: 2px;
+  transition: opacity .2s, border-color .2s;
+}
+.hud-links a:hover { opacity: 1; border-color: var(--honey-lamp); }
+.hud-links a:focus-visible, .hud-link:focus-visible {
+  outline: 2px solid var(--honey-lamp); outline-offset: 3px;
+}
+
+.hud-nav {
+  position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%);
+  display: flex; align-items: center; gap: 2px; padding: 6px;
+  background: var(--glass); border: 1px solid var(--hairline); border-radius: 999px;
+  backdrop-filter: blur(16px) saturate(1.2); -webkit-backdrop-filter: blur(16px) saturate(1.2);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, .35);
+}
+.hud-indicator {
+  position: absolute; top: 6px; bottom: 6px; left: 0; width: 0; opacity: 0;
+  border-radius: 999px; background: rgba(241, 230, 208, .12); pointer-events: none;
+}
+.hud-link {
+  position: relative; cursor: pointer; border: 0; border-radius: 999px; background: none;
+  padding: 11px 16px; color: var(--rag-paper); opacity: .72;
+  font: 700 .75rem/1 var(--font-mono); letter-spacing: .06em; text-transform: uppercase;
+  transition: opacity .2s, color .2s;
+}
+.hud-link:hover, .hud-link.is-hover, .hud-link:focus-visible { opacity: 1; color: var(--honey-lamp); }
+.hud-lamp { padding: 11px 14px; margin-left: 4px; }
+.hud-lamp::before {
+  content: ''; position: absolute; left: -3px; top: 8px; bottom: 8px; width: 1px; background: var(--hairline);
+}
+.hud-lamp-dot {
+  display: block; width: 12px; height: 12px; border-radius: 50%;
+  border: 2px solid var(--honey-lamp); transition: background-color .3s, box-shadow .3s;
+}
+.hud-lamp[aria-pressed="true"] .hud-lamp-dot {
+  background: var(--honey-lamp); box-shadow: 0 0 12px var(--honey-lamp);
+}
+
+.hud-tip {
+  position: fixed; top: 0; left: 0; pointer-events: none; opacity: 0;
+  display: flex; align-items: baseline; gap: 10px; padding: 8px 12px;
+  background: var(--glass-strong); border: 1px solid var(--hairline); border-radius: 999px;
+  color: var(--rag-paper); font: 600 1rem/1 var(--font-display); white-space: nowrap;
+  transition: opacity .2s var(--ease-out);
+}
+.hud-tip span {
+  color: var(--honey-lamp); font: 700 .625rem/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase;
+}
+.hud-tip.visible { opacity: 1; }
+
+@media (max-width: 700px) {
+  .hud-id { top: 16px; left: 16px; }
+  .hud-name { font-size: 1.2rem; }
+  .hud-nav {
+    left: 12px; right: 12px; bottom: 14px; transform: none;
+    overflow-x: auto; scrollbar-width: none;
+  }
+  .hud-link { flex: none; padding: 11px 13px; }
+  .hud-tip { display: none; }
+}

@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { markShadowCasters } from '../render/loadModel.js';
+import { markShadowCasters, withFallback } from '../render/loadModel.js';
 import { LAYOUT, applyPose } from './layout.js';
 
 function makeCoverTexture() {
@@ -28,7 +28,7 @@ function makeCoverTexture() {
 }
 
 export function createJournal() {
-  const group = new THREE.Group();
+  const fallback = new THREE.Group();
 
   const cover = new THREE.Mesh(
     new THREE.BoxGeometry(0.22, 0.05, 0.3),
@@ -67,7 +67,9 @@ export function createJournal() {
   strap.position.set(0, 0.058, 0);
   strap.castShadow = true;
 
-  group.add(cover, top, spine, pages, strap);
+  fallback.add(cover, top, spine, pages, strap);
+
+  const group = withFallback('/models/kit/journal.glb', fallback);
   markShadowCasters(group);
   applyPose(group, LAYOUT.journal);
   return { group, id: 'blog', label: 'journal' };

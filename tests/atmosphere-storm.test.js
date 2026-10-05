@@ -21,10 +21,9 @@ describe('createEnvironment window pane', () => {
 
   it('builds a hollow window frame that leaves the wall opening clear', () => {
     const { group } = createEnvironment();
-    const frameColor = 0x493522;
     const bars = [];
     group.traverse((o) => {
-      if (o.isMesh && o.material?.color?.getHex?.() === frameColor) bars.push(o);
+      if (o.isMesh && o.name === 'windowFrameBar') bars.push(o);
     });
 
     expect(bars.length).toBe(4);

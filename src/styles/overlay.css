@@ -1,17 +1,25 @@
 .overlay-page {
   position: fixed; inset: 0; display: none; overflow-y: auto;
-  background: rgba(51, 75, 95, .96); color: var(--rag-paper);
+  /* Glass over the paused 3D frame: the zoomed object stays visible, blurred. */
+  background: var(--glass); color: var(--rag-paper);
+  backdrop-filter: blur(22px) saturate(1.15);
+  -webkit-backdrop-filter: blur(22px) saturate(1.15);
 }
 .overlay-page.visible { display: block; }
 .overlay-back {
   position: fixed; top: 20px; left: 24px; z-index: 10; cursor: pointer;
-  background: var(--rag-paper); border: 1px solid var(--tobacco-oak); border-radius: 3px;
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--rag-paper); border: 1px solid transparent; border-radius: 999px;
   color: var(--ink); font: 700 .75rem/1.2 var(--font-mono); letter-spacing: .04em;
-  padding: 9px 13px; box-shadow: 0 4px 14px rgba(23, 27, 34, .3);
-  transition: background-color .18s, border-color .18s, color .18s;
+  padding: 9px 10px 9px 15px; box-shadow: 0 8px 24px rgba(0, 0, 0, .3);
+  transition: background-color .25s var(--ease-out), transform .25s var(--ease-out);
+}
+.overlay-back kbd {
+  padding: 2px 6px; border-radius: 999px; background: rgba(31, 35, 42, .1);
+  font: 700 .625rem/1.2 var(--font-mono); text-transform: uppercase;
 }
 .overlay-back:hover {
-  background: var(--honey-lamp); border-color: var(--honey-lamp); color: var(--storm-ink);
+  background: var(--honey-lamp); color: var(--storm-ink); transform: translateX(-2px);
 }
 .overlay-back:focus-visible {
   outline: 3px solid var(--honey-lamp); outline-offset: 3px;
@@ -19,4 +27,5 @@
 
 @media (max-width: 700px) {
   .overlay-back { top: 14px; left: 14px; }
+  .overlay-back kbd { display: none; }
 }

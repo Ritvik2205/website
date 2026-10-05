@@ -9,6 +9,7 @@ export function createInteractions(camera, domElement) {
   const items = [];
   let enabled = true;
   let hovered = null;
+  let hoverListener = null;
 
   domElement.addEventListener('pointermove', (e) => {
     pointer.x = (e.clientX / window.innerWidth) * 2 - 1;
@@ -72,6 +73,7 @@ export function createInteractions(camera, domElement) {
     hovered = item;
     if (hovered) applyHover(hovered, true);
     document.body.style.cursor = hovered ? 'pointer' : 'default';
+    hoverListener?.(hovered);
   }
 
   function update() {
@@ -93,5 +95,9 @@ export function createInteractions(camera, domElement) {
     setHover(found);
   }
 
-  return { register, update, setEnabled: (v) => { enabled = v; if (!v) setHover(null); } };
+  return {
+    register,
+    update,
+    setHoverListener: (fn) => { hoverListener = fn; },
+    setEnabled: (v) => { enabled = v; if (!v) setHover(null); } };
 }
