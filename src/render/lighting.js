@@ -52,9 +52,9 @@ export function createLighting(scene) {
 
   // Top-down pendant over the board: a narrow warm pool with hard falloff
   // (see docs/superpowers/specs/2026-10-06-investigation-board-design.md).
-  pendantSpot = new THREE.SpotLight(0xffb066, 4.2, 3.4, 0.72, 0.7, 1.4);
-  pendantSpot.position.set(0, 1.9, -0.92);
-  pendantSpot.target.position.set(0, 1.2, -1.17);
+  pendantSpot = new THREE.SpotLight(0xffc27a, 3.2, 4, 0.95, 0.85, 1.1);
+  pendantSpot.position.set(0, 1.68, -0.92);
+  pendantSpot.target.position.set(0, 0.93, -1.17);
   pendantSpot.castShadow = true;
   pendantSpot.shadow.mapSize.set(1024, 1024);
   pendantSpot.shadow.bias = -0.0004;
@@ -103,7 +103,7 @@ function applyMood(t) {
   // Warm orange when on; still amber (not cool white) when dimmed
   lampSpot.color.setHex(warm > 0.5 ? 0xff8c3a : 0xe8792e);
 
-  windowLight.intensity = THREE.MathUtils.lerp(0.5, 1.05, cool);
+  windowLight.intensity = THREE.MathUtils.lerp(0.7, 1.2, cool);
   windowLight.color.setRGB(
     THREE.MathUtils.lerp(0.95, 0.82, cool),
     THREE.MathUtils.lerp(0.9, 0.89, cool),
@@ -121,8 +121,8 @@ function applyMood(t) {
     );
   }
 
-  // Rough look: low fill so the room falls off into shadow between lamp pools.
-  hemiLight.intensity = THREE.MathUtils.lerp(0.3, 0.55, warm);
+  // Moody but readable: enough fill that the board's pages stay legible outside the pendant pool.
+  hemiLight.intensity = THREE.MathUtils.lerp(0.6, 0.9, warm);
   hemiLight.color.setHex(warm > 0.4 ? 0xd9dcf0 : 0xb4c4e0);
   hemiLight.groundColor.setHex(warm > 0.4 ? 0x4a3a30 : 0x26324a);
 }

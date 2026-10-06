@@ -13,9 +13,9 @@ const GradeShader = {
   uniforms: {
     tDiffuse: { value: null },
     uTime: { value: 0 },
-    uGrain: { value: 0.055 },
-    uVignette: { value: 0.6 },
-    uSepia: { value: 0.18 },
+    uGrain: { value: 0.03 },
+    uVignette: { value: 0.35 },
+    uSepia: { value: 0.12 },
   },
   vertexShader: /* glsl */ `
     varying vec2 vUv;
