@@ -261,6 +261,43 @@ function drawFeatured(g, W, H, entry, index) {
   g.fillText((entry.tags ?? []).join(' · ').toUpperCase(), pad, H * 0.93);
 }
 
+// Pinned experience sheets self-light from their own texture (text stays dark)
+// and sit in a manila case folder so they pop against the paper collage.
+const FEATURED_GLOW = 0.16;
+const FEATURED_GLOW_HOVER = 0.32;
+const FOLDER = { side: 0.022, tab: 0.032 };
+
+/** Manila folder behind a pinned sheet, with a `CASE 0n` tab above its top-left. */
+function caseFolder(slot, index) {
+  const w = slot.w + FOLDER.side * 2;
+  const h = slot.h + FOLDER.side * 2 + FOLDER.tab;
+  const [cv, g] = makeCanvas(w * PX_PER_M.set, h * PX_PER_M.set);
+  const W = cv.width;
+  const H = cv.height;
+  const tabH = (FOLDER.tab / h) * H;
+  g.fillStyle = '#d9a457';
+  g.fillRect(W * 0.06, 0, W * 0.46, tabH + 2);
+  g.fillRect(0, tabH, W, H - tabH);
+  g.strokeStyle = 'rgba(90, 55, 20, 0.55)';
+  g.lineWidth = Math.max(2, W * 0.008);
+  g.strokeRect(1, tabH + 1, W - 2, H - tabH - 2);
+  g.fillStyle = '#3b2a1a';
+  g.font = `700 ${Math.round(tabH * 0.52)}px "Space Mono", monospace`;
+  g.fillText(`CASE ${String(index + 1).padStart(2, '0')}`, W * 0.1, tabH * 0.72);
+  const map = toTexture(cv);
+  const folder = new THREE.Mesh(
+    new THREE.PlaneGeometry(w, h),
+    new THREE.MeshStandardMaterial({ map, roughness: 0.8, metalness: 0, alphaTest: 0.5, transparent: true }),
+  );
+  folder.name = 'caseFolder';
+  // Child of the sheet so it lifts with it; slightly skewed like a real folder.
+  folder.position.set(0, FOLDER.tab / 2, -0.0004);
+  folder.rotation.z = THREE.MathUtils.degToRad(-1.5);
+  folder.receiveShadow = true;
+  folder.castShadow = true;
+  return folder;
+}
+
 function sheetMesh(sheet, map, z) {
   const mesh = new THREE.Mesh(
     new THREE.PlaneGeometry(sheet.w, sheet.h),
@@ -377,11 +414,15 @@ export function createCorkboard() {
     const [cv, g] = makeCanvas(slot.w * PX_PER_M.featured, slot.h * PX_PER_M.featured);
     drawFeatured(g, cv.width, cv.height, null, i);
     const mesh = add({ ...slot, id: `f${i}` }, toTexture(cv), (z += step * 4));
+    mesh.material.emissive.setHex(0xffffff);
+    mesh.material.emissiveMap = mesh.material.map;
+    mesh.material.emissiveIntensity = FEATURED_GLOW;
+    mesh.add(caseFolder(slot, i));
     mesh.userData.slot = i;
     mesh.userData.baseZ = mesh.position.z;
     mesh.userData.canvas = [cv, g];
     const p = pinPoint(`f${i}`);
-    group.add(pin(0xcf6f4e, 0.012, p.x, p.y, mesh.position.z + 0.008));
+    group.add(pin(0xcf6f4e, 0.015, p.x, p.y, mesh.position.z + 0.01));
     return mesh;
   });
 
@@ -429,7 +470,7 @@ export function createCorkboard() {
     for (const mesh of featured) {
       const on = !!id && mesh.userData.experienceId === id;
       const to = { z: mesh.userData.baseZ + (on ? 0.03 : 0) };
-      const glow = { emissiveIntensity: on ? 0.07 : 0 };
+      const glow = { emissiveIntensity: on ? FEATURED_GLOW_HOVER : FEATURED_GLOW };
       if (reduced) {
         mesh.position.z = to.z;
         mesh.material.emissiveIntensity = glow.emissiveIntensity;

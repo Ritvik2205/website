@@ -94,7 +94,8 @@ function boardAnchor() {
   const [x, y, z] = LAYOUT.corkboard.position;
   const t = Math.tan(MathUtils.degToRad(camera.fov / 2));
   const d = Math.max((BOARD.height / 2 + 0.1) / t, (BOARD.width / 2 + 0.1) / (t * camera.aspect));
-  return { position: { x, y: y + 0.03, z: z + Math.min(d, 2.2) }, lookAt: { x, y, z } };
+  // Sit a little high so the camera looks over the laptop and lamp on the desk below.
+  return { position: { x, y: y + 0.24, z: z + Math.min(d, 2.2) }, lookAt: { x, y, z } };
 }
 
 /** Close in on one sheet, offset so the card has room on the opposite side. */
