@@ -11,7 +11,7 @@ export const FEATURED_SLOTS = [
   { x: -0.8, y: 0.12, w: 0.23, h: 0.29, rot: -2.5 },
   { x: -0.34, y: -0.13, w: 0.23, h: 0.29, rot: 1.5 },
   { x: 0.42, y: 0.07, w: 0.23, h: 0.29, rot: -1 },
-  { x: 0.88, y: -0.11, w: 0.23, h: 0.29, rot: 2.5 },
+  { x: 0.86, y: 0.15, w: 0.23, h: 0.29, rot: 2.5 },
 ];
 
 /** Large set pieces, like the reference wall's "master plan", map, and calendar. */

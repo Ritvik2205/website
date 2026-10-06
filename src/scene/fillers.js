@@ -93,18 +93,6 @@ function createPlantFallback() {
   return g;
 }
 
-function createKeyboardFallback() {
-  const g = new THREE.Group();
-  const kb = new THREE.Mesh(
-    new THREE.BoxGeometry(0.28, 0.02, 0.11),
-    new THREE.MeshStandardMaterial({ color: 0x25282b, roughness: 0.5, metalness: 0.2 }),
-  );
-  kb.position.y = 0.01;
-  kb.castShadow = true;
-  g.add(kb);
-  return g;
-}
-
 /** Non-interactive desk clutter to fill negative space. */
 export function createFillers() {
   const group = new THREE.Group();
@@ -126,9 +114,6 @@ export function createFillers() {
   applyPose(penCup, poses.penCup);
   group.add(penCup);
 
-  const keyboard = withFallback('/models/kit/keyboard.glb', createKeyboardFallback());
-  applyPose(keyboard, poses.keyboard);
-  group.add(keyboard);
 
   markShadowCasters(group);
   return { group };

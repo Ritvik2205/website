@@ -1,9 +1,10 @@
 import * as THREE from 'three';
 import gsap from 'gsap';
 
+// Frames the desk with the board and pendant behind it, no dead space above.
 const HOME = {
-  position: new THREE.Vector3(0, 0.95, 1.3),
-  lookAt: new THREE.Vector3(0, 0.95, -1.0),
+  position: new THREE.Vector3(0, 0.98, 1.12),
+  lookAt: new THREE.Vector3(0, 0.86, -1.0),
 };
 
 export function createCameraRig(camera) {
