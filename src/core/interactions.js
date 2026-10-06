@@ -11,12 +11,33 @@ export function createInteractions(camera, domElement) {
   let hovered = null;
   let hoverListener = null;
 
-  domElement.addEventListener('pointermove', (e) => {
+  function setPointer(e) {
     pointer.x = (e.clientX / window.innerWidth) * 2 - 1;
     pointer.y = -(e.clientY / window.innerHeight) * 2 + 1;
-  });
-  domElement.addEventListener('click', () => {
-    if (enabled && hovered) hovered.onClick(hovered);
+  }
+
+  function pick() {
+    raycaster.setFromCamera(pointer, camera);
+    let found = null;
+    let nearest = Infinity;
+    for (const item of items) {
+      const hits = raycaster.intersectObject(item.group, true);
+      if (hits.length && hits[0].distance < nearest) {
+        nearest = hits[0].distance;
+        found = item;
+      }
+    }
+    return found;
+  }
+
+  domElement.addEventListener('pointermove', setPointer);
+  // Pick at the click point itself: taps (and clicks without a prior move)
+  // arrive before any frame has updated the hover state.
+  domElement.addEventListener('click', (e) => {
+    if (!enabled) return;
+    setPointer(e);
+    const item = pick();
+    if (item) item.onClick(item);
   });
 
   function makeOutlineMesh(source) {
@@ -82,17 +103,7 @@ export function createInteractions(camera, domElement) {
     for (const item of items) ensureOutlines(item);
     if (hovered && !hovered.skipHoverVisual) applyHover(hovered, true);
 
-    raycaster.setFromCamera(pointer, camera);
-    let found = null;
-    let nearest = Infinity;
-    for (const item of items) {
-      const hits = raycaster.intersectObject(item.group, true);
-      if (hits.length && hits[0].distance < nearest) {
-        nearest = hits[0].distance;
-        found = item;
-      }
-    }
-    setHover(found);
+    setHover(pick());
   }
 
   return {

@@ -74,4 +74,27 @@ describe('createInteractions hover UI', () => {
     interactions.update();
     expect(outlines.every((o) => !o.visible)).toBe(true);
   });
+
+  it('fires onClick for a tap with no prior pointer move', () => {
+    vi.stubGlobal('document', { body: { style: {} } });
+    vi.stubGlobal('window', { innerWidth: 800, innerHeight: 600 });
+    const listeners = {};
+    const dom = { addEventListener: vi.fn((type, fn) => { listeners[type] = fn; }) };
+    const camera = new THREE.PerspectiveCamera(50, 800 / 600, 0.1, 100);
+    camera.position.set(0, 0, 1);
+    camera.updateMatrixWorld(true);
+
+    const interactions = createInteractions(camera, dom);
+    const group = new THREE.Group();
+    group.add(new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.2, 0.2), new THREE.MeshBasicMaterial()));
+    group.updateMatrixWorld(true);
+    const onClick = vi.fn();
+    interactions.register({ group, id: 'laptop', label: 'Laptop', skipHoverVisual: true, onClick });
+
+    listeners.click({ clientX: 400, clientY: 300 });
+    expect(onClick).toHaveBeenCalledTimes(1);
+
+    listeners.click({ clientX: 5, clientY: 5 });
+    expect(onClick).toHaveBeenCalledTimes(1);
+  });
 });
