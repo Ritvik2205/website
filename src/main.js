@@ -21,6 +21,7 @@ import { createOverlayManager } from './ui/overlay.js';
 import { createHud } from './ui/hud.js';
 import { createBoardUi } from './ui/boardUi.js';
 import { createSketchUi } from './ui/sketchUi.js';
+import { createMusicUi } from './ui/musicUi.js';
 import { createSketchbookPages } from './scene/sketchbookPages.js';
 import { createProjectsPage } from './ui/pages/projects.js';
 import { createGalleryPage } from './ui/pages/gallery.js';
@@ -255,6 +256,15 @@ window.addEventListener('keydown', (e) => {
   if (e.key === 'ArrowLeft') turnPage(-1);
 });
 
+// ---- Vinyl: the record spinning from above, then a playlist window ----
+focusModes.set('music', {
+  // Offset right so the record sits left of the playlist window.
+  anchor: () => topDownAnchor(vinyl.group, { height: 0.62, offsetX: 0.17 }),
+  enter: () => musicUi.show(),
+  back: async () => musicUi.hidePopup(),
+  exit: () => musicUi.hide(),
+});
+
 const vinyl = createVinyl();
 engine.onTick((dt) => vinyl.update(dt));
 
@@ -318,7 +328,11 @@ overlays.register('blog', journalPage.el, journalPage.hooks);
 
 const musicPage = createMusicPage(content.site);
 overlays.register('music', musicPage.el, musicPage.hooks);
-watchNowPlaying(content.site.spotify, vinyl.setRecord);
+const musicUi = createMusicUi(document.getElementById('ui'), { site: content.site, onBack: goBack });
+watchNowPlaying(content.site.spotify, (np) => {
+  vinyl.setRecord(np);
+  musicUi.setNowPlaying(np);
+});
 
 // The four most recent entries are pinned on the board and become clickable sheets.
 corkboard.setFeatured(content.experience);
