@@ -20,6 +20,8 @@ import { Box3, MathUtils, Vector3 } from 'three';
 import { createOverlayManager } from './ui/overlay.js';
 import { createHud } from './ui/hud.js';
 import { createBoardUi } from './ui/boardUi.js';
+import { createSketchUi } from './ui/sketchUi.js';
+import { createSketchbookPages } from './scene/sketchbookPages.js';
 import { createProjectsPage } from './ui/pages/projects.js';
 import { createGalleryPage } from './ui/pages/gallery.js';
 import { createBlogPage } from './ui/pages/blog.js';
@@ -96,6 +98,15 @@ async function openFocus(id) {
   interactions.setEnabled(false);
   await rig.flyTo(mode.anchor());
   await mode.enter();
+}
+
+/** Near-vertical look down at a desk object; the slight z offset keeps "up" stable. */
+function topDownAnchor(group, { height, offsetX = 0 }) {
+  const p = group.getWorldPosition(new Vector3());
+  return {
+    position: { x: p.x + offsetX, y: p.y + height, z: p.z + 0.04 },
+    lookAt: { x: p.x + offsetX, y: p.y, z: p.z },
+  };
 }
 
 async function closeFocus() {
@@ -214,6 +225,36 @@ sheetInteractions.setEnabled(false);
 engine.onTick(() => sheetInteractions.update());
 sheetInteractions.setHoverListener((item) => { if (!activeSheet) corkboard.setHovered(item?.id ?? null); });
 
+// ---- Sketchbook: turnable parchment pages, viewed from above ----
+async function turnPage(dir) {
+  if (await sketchPages.turn(dir)) sketchUi.setSpread(sketchPages.spread, sketchPages.spreads);
+}
+
+const sketchUi = createSketchUi(document.getElementById('ui'), { onBack: goBack, onTurn: turnPage });
+const pageInteractions = createInteractions(camera, engine.renderer.domElement);
+pageInteractions.setEnabled(false);
+engine.onTick(() => pageInteractions.update());
+
+focusModes.set('gallery', {
+  anchor: () => topDownAnchor(sketchbook.group, { height: 0.46 }),
+  enter: () => {
+    sketchUi.setSpread(sketchPages.spread, sketchPages.spreads);
+    sketchUi.show();
+    pageInteractions.setEnabled(true);
+  },
+  back: async () => false,
+  exit: () => {
+    sketchUi.hide();
+    pageInteractions.setEnabled(false);
+  },
+});
+
+window.addEventListener('keydown', (e) => {
+  if (focus !== focusModes.get('gallery')) return;
+  if (e.key === 'ArrowRight') turnPage(1);
+  if (e.key === 'ArrowLeft') turnPage(-1);
+});
+
 const vinyl = createVinyl();
 engine.onTick((dt) => vinyl.update(dt));
 
@@ -221,8 +262,13 @@ const laptop = createLaptop();
 engine.onTick((dt) => laptop.update(dt));
 
 const corkboard = createCorkboard();
+const sketchbook = createSketchbook();
+const sketchPages = createSketchbookPages();
+sketchbook.group.add(sketchPages.group);
+pageInteractions.register({ group: sketchPages.hitLeft, id: 'prev', label: 'previous page', skipHoverVisual: true, onClick: () => turnPage(-1) });
+pageInteractions.register({ group: sketchPages.hitRight, id: 'next', label: 'next page', skipHoverVisual: true, onClick: () => turnPage(1) });
 
-for (const obj of [laptop, createSketchbook(), createJournal(), vinyl, corkboard]) {
+for (const obj of [laptop, sketchbook, createJournal(), vinyl, corkboard]) {
   scene.add(obj.group);
   targets.set(obj.id, obj.group);
   interactions.register({ ...obj, onClick: (i) => guarded(openItem)(i.id) });
@@ -266,6 +312,7 @@ interactions.setHoverListener((item) => hud.setHover(item?.id ?? null));
 onModeChange((s) => hud.setVisible(s.mode === 'idle'));
 overlays.register('projects', createProjectsPage(content.projects));
 overlays.register('gallery', createGalleryPage(content.gallery));
+sketchPages.setContent(content.gallery, { title: 'Sketchbook', subtitle: 'sketches & photos' });
 const journalPage = createBlogPage(content.posts);
 overlays.register('blog', journalPage.el, journalPage.hooks);
 

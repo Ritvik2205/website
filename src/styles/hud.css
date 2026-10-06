@@ -118,3 +118,16 @@
   font: 700 .6rem/1.2 var(--font-mono); letter-spacing: .06em; text-transform: uppercase;
 }
 
+/* ---- sketchbook mode page bar ---- */
+.sketch-bar { gap: 8px; padding: 6px 18px 6px 6px; }
+.sketch-turn {
+  width: 36px; height: 36px; cursor: pointer; border: 0; border-radius: 50%;
+  background: rgba(241, 230, 208, .1); color: var(--rag-paper); font: 400 1.4rem/1 var(--font-display);
+  transition: background-color .2s, opacity .2s;
+}
+.sketch-turn:hover:not(:disabled) { background: var(--honey-lamp); color: var(--storm-ink); }
+.sketch-turn:disabled { opacity: .3; cursor: default; }
+.sketch-turn:focus-visible { outline: 2px solid var(--honey-lamp); outline-offset: 2px; }
+.sketch-count { min-width: 48px; text-align: center; color: var(--honey-lamp); }
+.sketch-hint { margin-left: 8px; opacity: .65; }
+@media (max-width: 700px) { .sketch-hint { display: none; } }

@@ -280,7 +280,8 @@ def build_sketchbook():
     for i in range(9):
         new_obj('SketchRing', torus(0.011, 0.0016, segs=24, tube=8), mat('graphite', 0.3, 0.7), r,
                 (0, -0.12 + i * 0.03, 0.016), (math.radians(90), 0, 0), smooth=True)
-    pencil = empty('Pencil', r, (0.16, -0.09, 0.022), (0, math.radians(90), math.radians(28)))
+    # Beside the book on the desk, so turnable pages never collide with it.
+    pencil = empty('Pencil', r, (0.285, -0.02, 0.006), (0, math.radians(90), math.radians(82)))
     new_obj('PencilBody', cyl(0.0055, 0.0055, 0.15, 6), mat('honey', 0.55), pencil, (0, 0, 0), smooth=False)
     new_obj('PencilTip', cyl(0.0055, 0.0012, 0.02, 6), mat('paper', 0.7), pencil, (0, 0, 0.085), smooth=False)
     new_obj('PencilEraser', cyl(0.0058, 0.0058, 0.014, 12), mat('clay', 0.8), pencil, (0, 0, -0.082), bevel=0.0015)
