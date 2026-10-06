@@ -64,8 +64,8 @@ function screenPoint(group) {
 
 async function openItem(id) {
   if (state.mode !== 'idle') return;
-  // Wide screens explore the corkboard in place; narrow ones go straight to the timeline.
-  if (id === 'experience' && camera.aspect >= 1) return openBoard();
+  // Wide screens explore focus objects in place; narrow ones get the overlay page.
+  if (focusModes.has(id) && camera.aspect >= 1) return openFocus(id);
   setMode('zoomed', id);
   interactions.setEnabled(false);
   await rig.flyTo(ANCHORS[id]);
@@ -83,9 +83,31 @@ async function closeItem() {
   setMode('idle');
 }
 
-// ---- Corkboard mode: zoomed('experience') without an overlay ----
-// Layers unwind one at a time: timeline overlay → sheet card → board → desk.
-let boardActive = false;
+// ---- In-place focus modes: zoomed(target) with the scene live, no overlay ----
+// Each mode is { anchor(), enter(), back(), exit() }. back() unwinds one inner
+// layer and resolves true, or false when the mode itself should close.
+const focusModes = new Map();
+let focus = null;
+
+async function openFocus(id) {
+  const mode = focusModes.get(id);
+  setMode('zoomed', id);
+  focus = mode;
+  interactions.setEnabled(false);
+  await rig.flyTo(mode.anchor());
+  await mode.enter();
+}
+
+async function closeFocus() {
+  await focus.exit();
+  focus = null;
+  setMode('closing');
+  await rig.flyHome();
+  interactions.setEnabled(true);
+  setMode('idle');
+}
+
+// ---- Corkboard: timeline overlay → sheet card → board → desk ----
 let activeSheet = null;
 let featuredEntries = [];
 
@@ -107,15 +129,6 @@ function sheetAnchor(id) {
     anchor: { position: { x, y: p.y, z: p.z + 0.62 }, lookAt: { x, y: p.y, z: p.z } },
     cardSide: side > 0 ? 'right' : 'left',
   };
-}
-
-async function openBoard() {
-  setMode('zoomed', 'experience');
-  boardActive = true;
-  interactions.setEnabled(false);
-  await rig.flyTo(boardAnchor());
-  boardUi.show();
-  sheetInteractions.setEnabled(true);
 }
 
 async function openSheet(id) {
@@ -152,18 +165,25 @@ async function closeTimeline() {
   if (!activeSheet) sheetInteractions.setEnabled(true);
 }
 
-async function closeBoard() {
-  boardUi.hideCard();
-  boardUi.hide();
-  activeSheet = null;
-  boardActive = false;
-  corkboard.setHovered(null);
-  sheetInteractions.setEnabled(false);
-  setMode('closing');
-  await rig.flyHome();
-  interactions.setEnabled(true);
-  setMode('idle');
-}
+focusModes.set('experience', {
+  anchor: boardAnchor,
+  enter: () => {
+    boardUi.show();
+    sheetInteractions.setEnabled(true);
+  },
+  back: async () => {
+    if (overlays.isOpen()) { await closeTimeline(); return true; }
+    if (activeSheet) { await closeSheet(); return true; }
+    return false;
+  },
+  exit: () => {
+    boardUi.hideCard();
+    boardUi.hide();
+    activeSheet = null;
+    corkboard.setHovered(null);
+    sheetInteractions.setEnabled(false);
+  },
+});
 
 // One transition at a time; extra clicks/keys during a camera move are dropped.
 let busy = false;
@@ -175,10 +195,9 @@ const guarded = (fn) => async (...args) => {
 
 const goBack = guarded(async () => {
   if (state.mode !== 'zoomed') return;
-  if (!boardActive) return closeItem();
-  if (overlays.isOpen()) return closeTimeline();
-  if (activeSheet) return closeSheet();
-  return closeBoard();
+  if (!focus) return closeItem();
+  if (await focus.back()) return;
+  return closeFocus();
 });
 
 overlays.setCloseHandler(goBack);
