@@ -94,6 +94,8 @@ export function createHud(root, { site, sections, onSelect, onLamp }) {
 
   function setVisible(visible) {
     el.classList.toggle('hidden', !visible);
+    // inert: no clicks or focus while hidden (an #ui > * rule would otherwise re-enable pointer events).
+    el.inert = !visible;
     if (!visible) setHover(null);
     if (reduced) {
       gsap.set([id, nav], { opacity: visible ? 1 : 0 });

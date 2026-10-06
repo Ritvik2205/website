@@ -1,4 +1,4 @@
-.hud.hidden { pointer-events: none; }
+#ui > .hud.hidden, .hud.hidden * { pointer-events: none; }
 .hud-id {
   position: fixed; top: 22px; left: 26px; pointer-events: auto;
   color: var(--rag-paper); text-shadow: 0 2px 12px rgba(0, 0, 0, .45);
@@ -117,3 +117,4 @@
   padding: 4px 8px; border-radius: 999px; border: 1px solid var(--hairline);
   font: 700 .6rem/1.2 var(--font-mono); letter-spacing: .06em; text-transform: uppercase;
 }
+
