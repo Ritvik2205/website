@@ -27,6 +27,7 @@ import { createMusicPage } from './ui/pages/music.js';
 import { createExperiencePage } from './ui/pages/experience.js';
 import { runIntro } from './ui/intro.js';
 import { loadContent } from './content/loader.js';
+import { watchNowPlaying } from './content/spotify.js';
 
 const ANCHORS = CAMERA_ANCHORS;
 
@@ -250,6 +251,7 @@ overlays.register('blog', journalPage.el, journalPage.hooks);
 
 const musicPage = createMusicPage(content.site);
 overlays.register('music', musicPage.el, musicPage.hooks);
+watchNowPlaying(content.site.spotify, vinyl.setRecord);
 
 // The four most recent entries are pinned on the board and become clickable sheets.
 corkboard.setFeatured(content.experience);

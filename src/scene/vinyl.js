@@ -23,6 +23,7 @@ function createFallback() {
     new THREE.CylinderGeometry(0.035, 0.035, 0.02, 24),
     new THREE.MeshStandardMaterial({ color: 0xc44444, roughness: 0.55, metalness: 0.1 }),
   );
+  label.name = 'Hub';
   platterGroup.add(platter, label);
 
   const tonearm = new THREE.Mesh(
@@ -39,6 +40,32 @@ function createFallback() {
   return group;
 }
 
+// Album art sits on a disc laid over the record's `Hub` (kit meshes carry no UVs).
+function createLabelDisc() {
+  const disc = new THREE.Mesh(
+    new THREE.CircleGeometry(1, 48),
+    new THREE.MeshStandardMaterial({
+      roughness: 0.6, metalness: 0.05, polygonOffset: true, polygonOffsetFactor: -2,
+    }),
+  );
+  disc.rotation.x = -Math.PI / 2;
+  disc.receiveShadow = true;
+  disc.visible = false;
+  return disc;
+}
+
+function mountLabel(disc, platter) {
+  const hub = platter.getObjectByName('Hub');
+  if (!hub) return;
+  hub.geometry.computeBoundingBox();
+  const { max } = hub.geometry.boundingBox;
+  disc.scale.setScalar(max.x);
+  disc.position.set(0, max.y + 0.0002, 0);
+  hub.add(disc);
+}
+
+const textureLoader = new THREE.TextureLoader().setCrossOrigin('anonymous');
+
 export function createVinyl() {
   const group = new THREE.Group();
   const fallback = createFallback();
@@ -50,6 +77,8 @@ export function createVinyl() {
 
   let platter = fallback.userData.platterGroup;
   let spinning = true;
+  const labelDisc = createLabelDisc();
+  mountLabel(labelDisc, platter);
 
   const poll = () => {
     if (player.userData.assetStatus === 'loaded') {
@@ -57,10 +86,12 @@ export function createVinyl() {
       player.visible = true;
       // Kit `Platter` carries the record and label as children; never spin the deck.
       platter = player.getObjectByName('Platter');
+      mountLabel(labelDisc, platter);
     } else if (player.userData.assetStatus === 'error') {
       player.visible = false;
       fallback.visible = true;
       platter = fallback.userData.platterGroup;
+      mountLabel(labelDisc, platter);
     } else {
       nextFrame(poll);
     }
@@ -75,6 +106,20 @@ export function createVinyl() {
     id: 'music',
     label: 'now spinning',
     setSpinning: (v) => { spinning = !!v; },
+    /** Put cover art (`{ art }` from content/spotify.js) on the record label. */
+    setRecord: ({ art }) => {
+      textureLoader.load(art, (texture) => {
+        texture.colorSpace = THREE.SRGBColorSpace;
+        const mat = labelDisc.material;
+        mat.map?.dispose();
+        mat.map = texture;
+        mat.needsUpdate = true;
+        labelDisc.visible = true;
+        // The kit's off-center HubDot would poke through the art.
+        const dot = player.getObjectByName('HubDot');
+        if (dot) dot.visible = false;
+      });
+    },
     update: (dt) => {
       if (!spinning || !platter) return;
       platter.rotation.y += dt * 2.2;

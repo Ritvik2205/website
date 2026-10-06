@@ -25,6 +25,15 @@ All content lives in `src/content/` — no code changes needed:
 
 Images: drop files into `public/` (e.g. `public/art/…`) and point the JSON `src`/`image` fields at them. Current placeholders are in `public/placeholders/`.
 
+## Spotify now playing (vinyl label)
+
+The record label shows the album art of whatever Ritvik is playing, else the cover of `site.json`'s `playlistId`. Live data comes from the Vercel function `api/now-playing.js` (visitors never log in); without it (e.g. `npm run dev`) the label shows the playlist cover.
+
+One-time setup (full walkthrough and troubleshooting in `docs/spotify-setup.md`):
+1. Create an app at https://developer.spotify.com/dashboard with redirect URI `http://127.0.0.1:8888/callback`.
+2. `SPOTIFY_CLIENT_ID=… SPOTIFY_CLIENT_SECRET=… node tools/spotify/get-refresh-token.js`, open the printed URL, approve.
+3. In Vercel project settings add env vars `SPOTIFY_CLIENT_ID`, `SPOTIFY_CLIENT_SECRET`, `SPOTIFY_REFRESH_TOKEN`, then redeploy.
+
 ## Architecture
 
 - `src/core/` — renderer/loop (`engine.js`), mode state machine (`state.js`), camera parallax + fly-to (`cameraRig.js`), raycast hover/click (`interactions.js`)
