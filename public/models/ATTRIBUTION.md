@@ -17,4 +17,10 @@ Regenerate with:
 |------|--------|---------|
 | `textures/storm-sky.jpg` | [Approaching Storm](https://polyhaven.com/a/approaching_storm) tonemapped JPG, resized to 2048×1024 | CC0 |
 
+## Parchment (OpenGameArt — CC0)
+
+| File | Source | License |
+|------|--------|---------|
+| `textures/parchment-1.jpg`, `textures/parchment-2.jpg` | [Old Paper Pack](https://opengameart.org/content/old-paper-pack) by Nia Mi (`Pergament1`, `Pergament2`), edges cropped, resized to 1024px | CC0 |
+
 Credit to Poly Haven as appreciated by its license.
