@@ -1,4 +1,4 @@
-# Ritvik Gupta — 3D Desk Portfolio
+# Ritvik Gupta — Portfolio
 
 First-person 3D desk scene built with three.js + GSAP. Every object on the desk opens a section: laptop → projects, sketchbook → art gallery, journal → blog, vinyl → music, corkboard → experience. The lamp actually turns off.
 
