@@ -657,7 +657,7 @@ describe('content', () => {
 - `projects.json`: 4 entries `{ id, title, description, tech: [..], image: "/placeholders/project-N.png", repoUrl: "https://github.com/ritvikgupta", liveUrl: null }` — titles "Portfolio Engine", "ML Experiments", "Pair Trading Research", "Rust Interpreter".
 - `experience.json`: 6 notes `{ id, type: sticky|ruled|polaroid, title, body, connections: [ids] }` (e.g. "Internship @ ...", "CMU", "Hackathon win", photo note) with 3 connection pairs.
 - `gallery.json`: 8 entries `{ src: "/placeholders/art-N.svg", caption, type }` alternating sketch/photo.
-- `site.json`: `{ name: "Ritvik Gupta", spotify: { playlistId: "37i9dQZF1DXcBWIGoYBM5M", profileUrl: "https://open.spotify.com/" }, socials: { github: "https://github.com/ritvikgupta", email: "ritvikg2@andrew.cmu.edu" } }`.
+- `site.json`: `{ name: "Ritvik Gupta", spotify: { playlistId: "37i9dQZF1DXcBWIGoYBM5M", profileUrl: "https://open.spotify.com/" }, socials: { github: "https://github.com/ritvikgupta", email: "ai.ritvik@gmail.com" } }`.
 - `blog/*.md`: frontmatter `title`, `date` + 2–3 paragraphs with `#` headings.
 - Generate `public/placeholders/` images as simple SVGs (rect + label text), one per project/art entry.
 
