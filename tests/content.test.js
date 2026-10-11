@@ -20,7 +20,8 @@ describe('content', () => {
     const c = await loadContent();
     expect(c.projects.length).toBeGreaterThan(0);
     for (const p of c.projects) {
-      expect(p).toMatchObject({ title: expect.any(String), description: expect.any(String) });
+      expect(p).toMatchObject({ id: expect.any(String), title: expect.any(String) });
+      if ('description' in p) expect(typeof p.description).toBe('string');
       expect(Array.isArray(p.tech)).toBe(true);
     }
     for (const n of c.experience) {

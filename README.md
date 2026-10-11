@@ -17,7 +17,7 @@ All content lives in `src/content/` — no code changes needed:
 
 | File | Shape |
 |---|---|
-| `projects.json` | `{ id, title, description, tech[], image, repoUrl, liveUrl }` |
+| `projects.json` | `{ id, title, description?, tech[], image?, repoUrl, liveUrl }` |
 | `experience.json` | `{ id, title, org, start: "YYYY-MM", end: "YYYY-MM"\|"present", summary, body, tags[] }` — four most recent are pinned on the 3D board |
 | `gallery.json` | `{ src, caption, type: "sketch"\|"photo" }` |
 | `site.json` | name, Spotify `playlistId` + `profileUrl`, socials |

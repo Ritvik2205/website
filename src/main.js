@@ -265,10 +265,12 @@ focusModes.set('music', {
   exit: () => musicUi.hide(),
 });
 
+const content = await loadContent();
+
 const vinyl = createVinyl();
 engine.onTick((dt) => vinyl.update(dt));
 
-const laptop = createLaptop();
+const laptop = createLaptop(content.projects.map((p) => p.id));
 engine.onTick((dt) => laptop.update(dt));
 
 const corkboard = createCorkboard();
@@ -303,8 +305,6 @@ const atmosphere = createAtmosphere({
 });
 scene.add(atmosphere.group);
 engine.onTick((dt) => atmosphere.update(dt));
-
-const content = await loadContent();
 
 const hud = createHud(document.getElementById('ui'), {
   site: content.site,

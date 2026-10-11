@@ -29,9 +29,9 @@ export function createProjectsPage(projects) {
         <span class="route-mark">FILE ${String(i + 1).padStart(2, '0')}</span>
         <span class="window-title">${p.title}</span>
       </header>
-      <img class="window-preview" src="${p.image}" alt="${p.title} preview" />
+      ${p.image ? `<img class="window-preview" src="${p.image}" alt="${p.title} preview" />` : ''}
       <div class="window-body">
-        <p>${p.description}</p>
+        ${p.description ? `<p>${p.description}</p>` : ''}
         <div class="tech-tags">${p.tech.map((t) => `<span class="tech-tag">${t}</span>`).join('')}</div>
         <footer class="window-links">${links}</footer>
       </div>`;

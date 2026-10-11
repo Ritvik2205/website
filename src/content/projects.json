@@ -1,38 +1,156 @@
 [
   {
-    "id": "portfolio-engine",
-    "title": "Portfolio Engine",
-    "description": "This site — a first-person 3D desk built with three.js and GSAP. Placeholder description: swap in the real story of how it works.",
-    "tech": ["three.js", "GSAP", "Vite"],
-    "image": "/placeholders/project-1.svg",
-    "repoUrl": "https://github.com/ritvikgupta",
+    "id": "c0-compiler",
+    "title": "Optimising Compiler for C0",
+    "description": "A complete optimising compiler in Rust: SSA construction, field-sensitive alias analysis, inter-procedural purity, LICM and inlining, with a full x86-64 backend (chordal graph-colouring register allocation with MCS ordering, LEA folding). 14–72% runtime speedups on kernels, within 6% of GCC -O1 on real benchmarks, with 24% smaller binaries.",
+    "tech": ["Rust", "SSA", "Register allocation", "x86-64"],
+    "repoUrl": null,
     "liveUrl": null
   },
   {
-    "id": "ml-experiments",
-    "title": "ML Experiments",
-    "description": "Placeholder: machine learning side projects and experiments. Replace with a real project write-up.",
-    "tech": ["Python", "PyTorch"],
-    "image": "/placeholders/project-2.svg",
-    "repoUrl": "https://github.com/ritvikgupta",
+    "id": "muni-bonds",
+    "title": "Municipal Bond Underpricing Detection",
+    "description": "A fair-value pricing engine (NSS yield curves, CatBoost) over 70M+ municipal bond trades that computes benchmark yields and mispricing spreads, giving a per-underwriter audit signal. Estimated $480M+ in annual issuer overpayment by stripping Treasury rate moves from post-issuance prices, and surfaced 1,994 direct pricing-rule violations. Presented as a research poster at CMU's Meeting of the Minds symposium.",
+    "tech": ["Python", "SQL", "pandas", "NumPy", "CatBoost", "scikit-learn"],
+    "repoUrl": null,
     "liveUrl": null
+  },
+  {
+    "id": "speculative-execution",
+    "title": "Speculative Execution Vulnerability Classifier",
+    "description": "An end-to-end system (corpus synthesis, ISA spec engine, GNN classifier, hardware and symbolic validation oracles) that classifies raw assembly into Spectre, L1TF, MDS and RETBLEED vulnerability classes across x86-64, ARM64 and RISC-V at 96% accuracy, plus a class-conditioned transformer that generates synthetic vulnerable assembly.",
+    "tech": ["Python", "PyTorch", "GNN", "Assembly", "C"],
+    "repoUrl": "https://github.com/Ritvik2205/speculative_execution",
+    "liveUrl": null
+  },
+  {
+    "id": "sator-ops",
+    "title": "SATOR Ops",
+    "description": "A full-stack decision system: Next.js dashboard, FastAPI backend with REST and WebSockets, Postgres, and a shared-types monorepo under Docker. It cross-validates sensor telemetry against vision data to flag physically impossible states, records each decision in a hash-chained audit log, and anchors the final artifact hash on Solana.",
+    "tech": ["TypeScript", "React", "FastAPI", "Postgres", "Docker"],
+    "repoUrl": null,
+    "liveUrl": null
+  },
+  {
+    "id": "battlecode-2025",
+    "title": "MIT Battlecode 2025",
+    "description": "Global top 11 among 1000+ teams: low-latency multi-agent bots with bug-algorithm pathfinding.",
+    "tech": ["Java"],
+    "repoUrl": "https://github.com/Ritvik2205/MITbattlecode2025",
+    "liveUrl": null
+  },
+  {
+    "id": "terminal-europe-2025",
+    "title": "Citadel Terminal Europe 2025",
+    "description": "6th in Europe of 40 invited teams: adaptive algos that infer opponent strategy from observed play and rebalance attack and defence each turn under a hard resource budget, using BFS search heuristics and DP.",
+    "tech": ["Python"],
+    "repoUrl": "https://github.com/Ritvik2205/Terminal-C1-Europe-2025",
+    "liveUrl": null
+  },
+  {
+    "id": "scottylabs-crm",
+    "title": "ScottyLabs Agentic CRM",
+    "description": "An agentic CRM that learns how ScottyLabs matches student teams with partner projects: a chat-style AI concierge that onboards staff into a knowledge base, auto-generated student group profiles for matching, and agents that qualify inbound partner leads through a pipeline.",
+    "tech": ["Python", "Flask", "TypeScript", "RAG"],
+    "repoUrl": "https://github.com/Ritvik2205/novaAI2025",
+    "liveUrl": null
+  },
+  {
+    "id": "cyber-cafe",
+    "title": "Cyber Café Simulation",
+    "description": "A nostalgic 90s cyber café built at HackCMU: classic arcade games (Snake, Pac-Man, Space Invaders, Tetris, Pong), accounts, leaderboards and saved game state behind a retro CRT-styled UI.",
+    "tech": ["TypeScript", "React", "FastAPI", "Docker"],
+    "repoUrl": "https://github.com/Ritvik2205/hackcmu-cybercafe",
+    "liveUrl": null
+  },
+  {
+    "id": "portfolio",
+    "title": "This Portfolio",
+    "description": "A first-person 3D desk where every object opens a section, built with three.js, GSAP and a Blender-generated asset kit.",
+    "tech": ["JavaScript", "three.js", "GSAP", "Blender"],
+    "repoUrl": "https://github.com/Ritvik2205/website",
+    "liveUrl": "https://portfolio-website-bice-three-43.vercel.app"
   },
   {
     "id": "pair-trading",
-    "title": "Pair Trading Research",
-    "description": "Placeholder: statistical arbitrage research — cointegration testing and backtesting on equity pairs.",
-    "tech": ["Python", "pandas", "NumPy"],
-    "image": "/placeholders/project-3.svg",
-    "repoUrl": "https://github.com/ritvikgupta",
+    "title": "Pair Trading",
+    "tech": ["Python", "Jupyter"],
+    "repoUrl": "https://github.com/Ritvik2205/PairTrading",
     "liveUrl": null
   },
   {
-    "id": "rust-interpreter",
-    "title": "Rust Interpreter",
-    "description": "Placeholder: a tree-walking interpreter written in Rust. Replace with language features and design notes.",
-    "tech": ["Rust"],
-    "image": "/placeholders/project-4.svg",
-    "repoUrl": "https://github.com/ritvikgupta",
+    "id": "reports-dashboard",
+    "title": "Dynamic Report Generator",
+    "description": "A full-stack app that connects to a MySQL database, joins chosen tables, and builds custom reports with sorting, date ranges, search, AND/OR filters, and CSV or Excel export.",
+    "tech": ["Python", "Flask", "JavaScript", "MySQL", "MongoDB"],
+    "repoUrl": "https://github.com/Ritvik2205/reports-dashboard",
+    "liveUrl": null
+  },
+  {
+    "id": "notes-app",
+    "title": "Full Stack Notes App",
+    "description": "A Flask notes app storing users and notes in MySQL, caching sessions in Redis and logging activity to MongoDB, fully containerised with Docker.",
+    "tech": ["Python", "Flask", "MySQL", "Redis", "MongoDB", "Docker"],
+    "repoUrl": "https://github.com/Ritvik2205/full-stack-notes-app",
+    "liveUrl": null
+  },
+  {
+    "id": "chipinai-backend",
+    "title": "ChipIn AI Backend",
+    "description": "A REST API with user registration, email confirmation and JWT authentication, deployed with Docker.",
+    "tech": ["Python", "Docker"],
+    "repoUrl": "https://github.com/Ritvik2205/chipinai-backend",
+    "liveUrl": null
+  },
+  {
+    "id": "steam-insights",
+    "title": "Steam Catalog Insights",
+    "description": "Data analysis over a Steam video game catalog: game details, genres, tags, reviews and SteamSpy sales and playtime estimates.",
+    "tech": ["Python", "Jupyter", "SQL"],
+    "repoUrl": "https://github.com/Ritvik2205/fds-cw2",
+    "liveUrl": null
+  },
+  {
+    "id": "lstm-forecasting",
+    "title": "LSTM Forecasting",
+    "tech": ["Python"],
+    "repoUrl": "https://github.com/Ritvik2205/LSTM-forecasting",
+    "liveUrl": null
+  },
+  {
+    "id": "travel-companion",
+    "title": "Hula Hoops",
+    "description": "Travel companion web app built at HackTheBurgh.",
+    "tech": ["JavaScript", "HTML"],
+    "repoUrl": "https://github.com/Ritvik2205/travel-companion",
+    "liveUrl": null
+  },
+  {
+    "id": "language-learning-game",
+    "title": "Language Learning Game",
+    "tech": ["Python", "JavaScript"],
+    "repoUrl": "https://github.com/Ritvik2205/Language-Learning-Game",
+    "liveUrl": null
+  },
+  {
+    "id": "intimateq",
+    "title": "IntimateQ",
+    "tech": ["Python", "JavaScript"],
+    "repoUrl": "https://github.com/Ritvik2205/IntimateQ",
+    "liveUrl": null
+  },
+  {
+    "id": "stocks-comparison",
+    "title": "Stocks Comparison",
+    "tech": ["Python"],
+    "repoUrl": "https://github.com/Ritvik2205/stocks-comparison",
+    "liveUrl": null
+  },
+  {
+    "id": "advent-of-code-2024",
+    "title": "Advent of Code 2024",
+    "tech": ["Python"],
+    "repoUrl": "https://github.com/Ritvik2205/AdventOfCode2024",
     "liveUrl": null
   }
 ]

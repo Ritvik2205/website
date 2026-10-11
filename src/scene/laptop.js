@@ -42,7 +42,7 @@ function createFallback(screenMaterial) {
   return { group, screen };
 }
 
-export function createLaptop() {
+export function createLaptop(projectNames = ['portfolio']) {
   const group = new THREE.Group();
 
   const cv = document.createElement('canvas');
@@ -54,10 +54,11 @@ export function createLaptop() {
   g.font = '24px monospace';
   g.fillStyle = '#e7dec9';
   g.fillText('$ ~/projects', 24, 48);
-  ['portfolio', 'ml-engine', 'api-server'].forEach((project, i) => {
+  const shown = projectNames.slice(0, 4);
+  shown.forEach((project, i) => {
     const y = 92 + i * 40;
     g.fillStyle = '#688178';
-    g.fillText(i === 2 ? '└──' : '├──', 24, y);
+    g.fillText(i === shown.length - 1 ? '└──' : '├──', 24, y);
     g.fillStyle = '#e7dec9';
     g.fillText(project, 84, y);
   });

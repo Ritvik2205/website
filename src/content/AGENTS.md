@@ -4,7 +4,7 @@ Prefer content edits here over code changes. Static assets belong in `../../publ
 
 ## Schemas
 
-- `projects.json`: entries use `id`, `title`, `description`, `tech` array, `image`, `repoUrl`, and `liveUrl`.
+- `projects.json`: entries use `id`, `title`, `tech` array, `repoUrl`, and `liveUrl`; `description` and `image` are optional and skipped when absent.
 - `experience.json`: entries use `id`, `title` (role), `org`, `start` (`YYYY-MM`), `end` (`YYYY-MM` or `present`), `summary` (one line, printed on the 3D board sheet and card), `body`, and a `tags` array. The loader sorts newest first; the first four become the pinned sheets on the 3D board.
 - `gallery.json`: entries use `src`, `caption`, and `type` (`sketch` or `photo`).
 - `site.json`: contains the display name, Spotify `playlistId` and `profileUrl`, and social links.
