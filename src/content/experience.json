@@ -1,62 +1,52 @@
 [
   {
-    "id": "internship",
+    "id": "jpmorgan",
     "title": "Software Engineering Intern",
-    "org": "Placeholder Co.",
-    "start": "2026-05",
+    "org": "JPMorgan Chase & Co.",
+    "start": "2026-06",
     "end": "2026-08",
-    "summary": "Placeholder: one line on the team and what you shipped.",
-    "body": "Placeholder: internship details — team, what you built, the stack, and measurable impact. Replace with the real experience.",
-    "tags": ["TypeScript", "Distributed systems"]
+    "summary": "Runtime forecasting for Databricks/Airflow pipelines, and an 11× faster SLM Q&A stack.",
+    "body": "Designed and shipped a runtime-forecasting and batch-simulation service for the bank's Databricks/Airflow pipelines, replacing manual post-hoc failure triage with predictive scheduling: runtime predictions within 5% MAE, deployed to SRE teams worldwide, saving 4+ hours of manual monitoring daily. Extended it into a scheduling simulator modelling runtime as a function of compute allocation, letting SREs stress-test configurations against client SLAs and surfacing systematic overprovisioning. Replaced production's 55s frontier-LLM Q&A pipeline with a 5s (11×) spec-driven SLM stack on a single GPU, a deterministic query_spec compiler backed by per-domain QLoRA and RL fine-tuning, lifting table-routing fidelity from 76% to 84%.",
+    "tags": ["Python", "Databricks", "Airflow", "QLoRA", "Glasgow, UK"]
   },
   {
-    "id": "trading",
-    "title": "Competitor",
-    "org": "IMC Prosperity",
-    "start": "2026-03",
-    "end": "2026-04",
-    "summary": "Placeholder: algorithmic trading competition — strategy and placing.",
-    "body": "Placeholder: algorithmic trading competition — the strategies you tried, how you backtested them, and results.",
-    "tags": ["Python", "Market making"]
+    "id": "plythos",
+    "title": "Co-Founder · ML Research & Software Engineer",
+    "org": "Plythos-AI",
+    "start": "2025-09",
+    "end": "present",
+    "summary": "MCTS negotiation planner distilled into a sub-millisecond controller, live with a 10K+ customer pilot.",
+    "body": "Shipped an MCTS offer planner with online opponent modelling, then distilled the search policy into a deterministic controller with zero inference calls at decision time (under 1 ms per decision on CPU, down from $0.04 per decision of LLM inference). Against scripted adversarial buyers it conceded 43% of the bargaining range versus 100% for a prompted-LLM baseline, with the opponent model fit on 468 real negotiations. Live with a pilot serving 10K+ customers monthly. Co-authored outcome-grounded criterion validation of LLM judges (accepted at a NeurIPS 2026 workshop), cutting downstream-outcome prediction error 30.7% across 6,682 negotiations.",
+    "tags": ["MCTS", "LLMs", "TypeScript", "Edinburgh, UK"]
   },
   {
-    "id": "hackathon",
-    "title": "Winner",
-    "org": "Neuphonic Hackathon, Edinburgh",
-    "start": "2025-11",
-    "end": "2025-11",
-    "summary": "Placeholder: what the team built in a weekend and why it won.",
-    "body": "Placeholder: Neuphonic Edinburgh hackathon — the problem, what the team built, your part in it, and how it went.",
-    "tags": ["Voice AI", "Hackathon"]
+    "id": "icsa",
+    "title": "Machine Learning Researcher",
+    "org": "Institute for Computing Systems Architecture, University of Edinburgh",
+    "start": "2025-05",
+    "end": "2025-09",
+    "summary": "GNN classifying assembly into speculative-execution vulnerability classes at 96% accuracy across three ISAs.",
+    "body": "Built an end-to-end system (corpus synthesis, ISA spec engine, GNN classifier, hardware and symbolic validation oracles) classifying raw assembly into speculative-execution vulnerability classes (Spectre, L1TF, MDS, RETBLEED) across x86-64, ARM64 and RISC-V at 96.0% accuracy, with cross-ISA generalisation. Trained a class-conditioned transformer with RL fine-tuning that generates synthetic vulnerable assembly 7.4× more often than an unconditioned baseline, validated with symbolic execution (Spectector) and bare-metal fuzzing (Revizor), confirming real MDS/L1TF leaks surviving disabled hyperthreading.",
+    "tags": ["PyTorch", "GNN", "Security", "Assembly"]
   },
   {
     "id": "cmu",
-    "title": "B.S. Computer Science",
+    "title": "Study Exchange, Computer Science",
     "org": "Carnegie Mellon University",
-    "start": "2024-08",
-    "end": "present",
-    "summary": "Placeholder: focus areas and standout courses.",
-    "body": "Placeholder: studying at Carnegie Mellon. Courses, focus areas, research, and activities.",
-    "tags": ["Systems", "ML"]
+    "start": "2025-08",
+    "end": "2026-05",
+    "summary": "GPA 3.81/4.0, Dean's List with High Honours.",
+    "body": "Study exchange in Computer Science at Carnegie Mellon, Pittsburgh. GPA 3.81/4.0 (Dean's List, High Honours). Coursework: Markov Chains, Options Pricing, Optimisation, Compiler Design, Deep Learning, Reinforcement Learning.",
+    "tags": ["Compilers", "Deep Learning", "Pittsburgh, PA"]
   },
   {
-    "id": "london",
-    "title": "Study Abroad",
-    "org": "London",
-    "start": "2025-09",
-    "end": "2025-12",
-    "summary": "Placeholder: a semester away and what it taught you.",
-    "body": "Placeholder: a photo and the story behind it.",
-    "tags": ["Travel"]
-  },
-  {
-    "id": "exploring",
-    "title": "Currently Exploring",
-    "org": "Side projects",
-    "start": "2026-01",
-    "end": "present",
-    "summary": "Placeholder: what you're tinkering with right now.",
-    "body": "Placeholder: things I'm currently exploring — replace with a real list.",
-    "tags": ["Learning"]
+    "id": "edinburgh",
+    "title": "BSc (Hons.) Artificial Intelligence and Computer Science",
+    "org": "University of Edinburgh",
+    "start": "2023-09",
+    "end": "2027-07",
+    "summary": "AI and Computer Science, GPA 95%.",
+    "body": "BSc (Hons.) in Artificial Intelligence and Computer Science at the University of Edinburgh, GPA 95%.",
+    "tags": ["AI", "Computer Science", "Edinburgh, UK"]
   }
 ]
