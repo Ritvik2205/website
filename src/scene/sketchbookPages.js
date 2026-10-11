@@ -48,59 +48,80 @@ function drawParchment(g, W, H, parchment) {
   g.fillRect(0, 0, W, H);
 }
 
+function roundedClip(g, W, H, r) {
+  g.beginPath();
+  g.moveTo(r, 0);
+  g.arcTo(W, 0, W, H, r);
+  g.arcTo(W, H, 0, H, r);
+  g.arcTo(0, H, 0, 0, r);
+  g.arcTo(0, 0, W, 0, r);
+  g.closePath();
+  g.clip();
+}
+
+/**
+ * Full-bleed page: the drawing covers the whole sheet (no margins), laid over
+ * rusty parchment so stains still read through the paper's light areas.
+ */
 function drawFace(g, face, parchment, image) {
   const { w: W, h: H } = TEX;
+  g.clearRect(0, 0, W, H);
   g.save();
+  // Rounded paper corners; outside the clip stays transparent (alphaTest cuts it).
+  roundedClip(g, W, H, 26);
   drawParchment(g, W, H, parchment);
-  g.fillStyle = INK;
-  g.textAlign = 'center';
 
   if (face.kind === 'title') {
+    g.fillStyle = INK;
+    g.textAlign = 'center';
     g.font = '600 92px Caveat, cursive';
-    g.fillText(face.title, W / 2, H * 0.42);
+    g.fillText(face.title, W / 2, H * 0.44);
     g.font = '400 44px Caveat, cursive';
     g.globalAlpha = 0.75;
-    g.fillText(face.subtitle, W / 2, H * 0.5);
-  } else if (face.kind === 'item') {
-    const box = { x: W * 0.12, y: H * 0.1, w: W * 0.76, h: H * 0.62 };
-    if (image) {
-      const s = Math.min(box.w / image.width, box.h / image.height);
-      const iw = image.width * s;
-      const ih = image.height * s;
-      const ix = box.x + (box.w - iw) / 2;
-      const iy = box.y + (box.h - ih) / 2;
-      if (face.item.type === 'photo') {
-        // A sepia print taped onto the page.
-        g.translate(W / 2, iy + ih / 2);
-        g.rotate(face.tilt);
-        g.translate(-W / 2, -(iy + ih / 2));
-        g.fillStyle = '#efe4cc';
-        g.fillRect(ix - 14, iy - 14, iw + 28, ih + 46);
-        g.filter = 'sepia(0.6) contrast(1.05) brightness(0.92)';
-        g.drawImage(image, ix, iy, iw, ih);
-        g.filter = 'none';
-        g.fillStyle = 'rgba(236, 226, 200, 0.75)';
-        g.fillRect(ix + iw * 0.4, iy - 28, iw * 0.22, 30);
-        g.setTransform(1, 0, 0, 1, 0, 0);
-      } else {
-        // Sketches read as drawn into the paper: multiply + sepia ink.
+    g.fillText(face.subtitle, W / 2, H * 0.52);
+  } else if (face.kind === 'item' && image) {
+    if (face.item.type === 'photo') {
+      g.filter = 'sepia(0.45) contrast(1.05)';
+      g.globalAlpha = 0.94;
+      drawCover(g, image, W, H);
+      g.globalAlpha = 1;
+      g.filter = 'none';
+      // Re-stain the print so it belongs to the same rusty paper.
+      if (parchment) {
         g.globalCompositeOperation = 'multiply';
-        g.filter = 'sepia(0.85) contrast(1.15)';
-        g.drawImage(image, ix, iy, iw, ih);
-        g.filter = 'none';
+        g.globalAlpha = 0.35;
+        drawCover(g, parchment, W, H);
+        g.globalAlpha = 1;
         g.globalCompositeOperation = 'source-over';
       }
+    } else {
+      // Ink and marker sit in the paper: multiply keeps the parchment showing through.
+      g.globalCompositeOperation = 'multiply';
+      g.filter = 'contrast(1.1) saturate(0.9)';
+      drawCover(g, image, W, H);
+      g.filter = 'none';
+      g.globalCompositeOperation = 'source-over';
     }
-    g.fillStyle = INK;
-    g.font = '600 54px Caveat, cursive';
-    g.fillText(face.item.caption ?? '', W / 2, H * 0.84);
+    // Scorch the edges again on top of the art.
+    const burn = g.createRadialGradient(W / 2, H / 2, Math.min(W, H) * 0.45, W / 2, H / 2, Math.max(W, H) * 0.75);
+    burn.addColorStop(0, 'rgba(80, 40, 15, 0)');
+    burn.addColorStop(1, 'rgba(70, 35, 12, 0.45)');
+    g.fillStyle = burn;
+    g.fillRect(0, 0, W, H);
   }
 
-  if (face.number) {
-    g.globalAlpha = 0.6;
-    g.font = '700 22px "Space Mono", monospace';
-    g.textAlign = face.number % 2 ? 'right' : 'left';
-    g.fillText(String(face.number), face.number % 2 ? W * 0.9 : W * 0.1, H * 0.95);
+  if (face.kind === 'item') {
+    // Small handwritten tag in the corner instead of a caption block.
+    const label = face.item.caption ?? '';
+    g.font = '600 40px Caveat, cursive';
+    const tw = g.measureText(label).width;
+    const left = face.number % 2 === 0;
+    const x = left ? W * 0.06 : W * 0.94 - tw - 28;
+    g.fillStyle = 'rgba(236, 222, 190, 0.86)';
+    g.fillRect(x, H * 0.9, tw + 28, 50);
+    g.fillStyle = INK;
+    g.textAlign = 'left';
+    g.fillText(label, x + 14, H * 0.9 + 37);
   }
   g.restore();
 }
@@ -135,11 +156,15 @@ function bend(geo, p, y) {
   const rest = geo.userData.rest;
   const pos = geo.attributes.position;
   const theta = p * Math.PI;
-  const curl = -0.55 * Math.sin(p * Math.PI);
+  const lift = Math.sin(p * Math.PI);
+  const curl = -0.9 * lift;
   for (let i = 0; i < pos.count; i++) {
     const u = rest[i * 3];
-    const a = theta + curl * (u / PAGE.w);
-    pos.setXYZ(i, u * Math.cos(a), y + u * Math.sin(a), rest[i * 3 + 2]);
+    const t = u / PAGE.w;
+    // Outer edge lags (curl) and the free corner billows slightly toward the viewer.
+    const a = theta + curl * t * t;
+    const z = rest[i * 3 + 2];
+    pos.setXYZ(i, u * Math.cos(a), y + u * Math.sin(a) + 0.012 * lift * t, z * (1 - 0.03 * lift * t));
   }
   pos.needsUpdate = true;
   geo.computeVertexNormals();
@@ -149,15 +174,41 @@ function makeSheet() {
   const geo = sheetGeometry();
   const front = faceTexture(false);
   const back = faceTexture(true);
-  const frontMesh = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ map: front.tex, roughness: 0.9, side: THREE.FrontSide }));
-  const backMesh = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ map: back.tex, roughness: 0.9, side: THREE.BackSide }));
+  const mat = (map, side) => new THREE.MeshStandardMaterial({ map, roughness: 0.9, side, alphaTest: 0.5 });
+  const frontMesh = new THREE.Mesh(geo, mat(front.tex, THREE.FrontSide));
+  const backMesh = new THREE.Mesh(geo, mat(back.tex, THREE.BackSide));
   for (const m of [frontMesh, backMesh]) {
     m.castShadow = true;
     m.receiveShadow = true;
   }
   const group = new THREE.Group();
   group.add(frontMesh, backMesh);
-  return { group, geo, front, back, p: 0, restY: 0, turnedY: 0 };
+  return { group, geo, front, back, materials: [frontMesh.material, backMesh.material], p: 0, restY: 0, turnedY: 0 };
+}
+
+const FAN = { max: 10, dx: 0.008, dz: -0.0055, dy: -0.0007 };
+
+/**
+ * Sheets beneath the visible spread, fanned outward so the book's thickness
+ * and the next pages' art peek past the edge (as in the reference reel).
+ */
+function makeFan(side) {
+  const layers = [];
+  for (let k = 0; k < FAN.max; k++) {
+    const mesh = new THREE.Mesh(
+      new THREE.PlaneGeometry(PAGE.w, PAGE.d),
+      new THREE.MeshStandardMaterial({ roughness: 0.92, alphaTest: 0.5, side: THREE.DoubleSide }),
+    );
+    mesh.rotation.x = -Math.PI / 2;
+    // Left layers mirror so the outer edge of a left page stays outermost.
+    mesh.scale.x = side;
+    mesh.position.set(side * (PAGE.w / 2 + (k + 1) * FAN.dx), (k + 1) * FAN.dy, (k + 1) * FAN.dz);
+    mesh.material.color.setScalar(1 - 0.05 * (k + 1));
+    mesh.receiveShadow = true;
+    mesh.visible = false;
+    layers.push(mesh);
+  }
+  return layers;
 }
 
 function hitZone(x) {
@@ -178,13 +229,38 @@ export function createSketchbookPages() {
   const hitLeft = hitZone(-PAGE.w / 2);
   const hitRight = hitZone(PAGE.w / 2);
   group.add(hitLeft, hitRight);
+  const fanRight = makeFan(1);
+  const fanLeft = makeFan(-1);
+  group.add(...fanRight, ...fanLeft);
 
   let sheets = [];
   let spread = 0;
   let spreads = 1;
   let turning = false;
 
-  const place = (sheet) => bend(sheet.geo, sheet.p, THREE.MathUtils.lerp(sheet.restY, sheet.turnedY, sheet.p));
+  /** Show the sheets under each side of the current spread with their own art. */
+  function updateFan() {
+    fanRight.forEach((mesh, k) => {
+      const sheet = sheets[spread + 2 + k];
+      mesh.visible = !!sheet;
+      if (sheet) mesh.material.map = sheet.front.tex;
+      mesh.material.needsUpdate = true;
+    });
+    fanLeft.forEach((mesh, k) => {
+      const sheet = sheets[spread - 1 - k];
+      mesh.visible = !!sheet;
+      // Back textures are pre-mirrored for BackSide; the mirrored layer undoes it.
+      if (sheet) mesh.material.map = sheet.back.tex;
+      mesh.material.needsUpdate = true;
+    });
+  }
+
+  const place = (sheet) => {
+    bend(sheet.geo, sheet.p, THREE.MathUtils.lerp(sheet.restY, sheet.turnedY, sheet.p));
+    // Darken a little as the page stands up and turns away from the lamp.
+    const shade = 1 - 0.28 * Math.sin(sheet.p * Math.PI);
+    for (const m of sheet.materials) m.color.setScalar(shade);
+  };
 
   /** Lay out the gallery as spreads: a title page, then one item per page. */
   async function setContent(items, { title, subtitle }) {
@@ -208,6 +284,7 @@ export function createSketchbookPages() {
       group.add(sheet.group);
     });
     spread = 0;
+    updateFan();
 
     await globalThis.document?.fonts?.load?.('54px Caveat').catch(() => {});
     const [parchments, images] = await Promise.all([
@@ -234,6 +311,7 @@ export function createSketchbookPages() {
     if (turning || next < 0 || next >= spreads) return Promise.resolve(false);
     const sheet = sheets[dir > 0 ? spread + 1 : spread];
     spread = next;
+    updateFan();
     const to = dir > 0 ? 1 : 0;
     if (reduced) {
       sheet.p = to;
