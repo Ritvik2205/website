@@ -4,6 +4,10 @@
   overflow: hidden;
   background: radial-gradient(circle at 50% 38%, #334B5F 0%, #24313d 42%, #171B22 78%);
 }
+.intro-flash {
+  position: fixed; inset: 0; z-index: 60; pointer-events: none;
+  background: radial-gradient(circle at 70% 18%, #ffffff 0%, #eaf1ff 38%, #c9d8f2 100%);
+}
 .intro::after {
   content: ''; position: absolute; z-index: 0; pointer-events: none;
   left: 50%; bottom: -18%; width: min(760px, 92vw); height: 42%;

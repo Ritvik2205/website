@@ -224,5 +224,10 @@ export function createAtmosphere({
     }
   }
 
-  return { group, update };
+  /** Fire a lightning flash now (the intro's arrival strike). */
+  function strike() {
+    if (!reduced) flashElapsed = 0;
+  }
+
+  return { group, update, strike };
 }

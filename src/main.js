@@ -348,6 +348,6 @@ overlays.register('experience', experiencePage.el);
 
 engine.start();
 rig.setParallaxEnabled(false);
-await runIntro(camera, rig);
+await runIntro(camera, rig, { onStrike: atmosphere.strike });
 rig.setParallaxEnabled(true);
 setMode('idle');

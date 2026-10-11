@@ -9,7 +9,15 @@ const BOOT_LINES = [
   'POSTROOM READY.',
 ];
 
-export function runIntro(camera, rig) {
+// Opacity keyframes for the arrival strike: hard white-out, dip, softer re-flash, fade.
+const STRIKE = [
+  { opacity: 1, duration: 0.06, ease: 'none' },
+  { opacity: 0.18, duration: 0.12, ease: 'power1.out' },
+  { opacity: 0.75, duration: 0.07, ease: 'none' },
+  { opacity: 0, duration: 0.9, ease: 'power2.out' },
+];
+
+export function runIntro(camera, rig, { onStrike = () => {} } = {}) {
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const revisit = localStorage.getItem('visited');
 
@@ -42,20 +50,27 @@ export function runIntro(camera, rig) {
       if (finished) return;
       finished = true;
       localStorage.setItem('visited', '1');
-      await gsap.to(intro, { opacity: 0, duration: 0.5 }).then();
-      intro.remove();
+      camera.position.copy(rig.HOME.position);
+      camera.lookAt(rig.HOME.lookAt);
       if (skipped) {
-        camera.position.copy(rig.HOME.position);
-        camera.lookAt(rig.HOME.lookAt);
-      } else {
-        camera.position.set(0, 1.6, 3.4);
-        camera.lookAt(rig.HOME.lookAt);
-        await gsap.to(camera.position, {
-          x: rig.HOME.position.x, y: rig.HOME.position.y, z: rig.HOME.position.z,
-          duration: 2, ease: 'power3.inOut',
-          onUpdate: () => camera.lookAt(rig.HOME.lookAt),
-        }).then();
+        await gsap.to(intro, { opacity: 0, duration: 0.5 }).then();
+        intro.remove();
+        resolve();
+        return;
       }
+      // Open straight onto the desk under a single lightning strike: the flash
+      // whites out the intro, which is swapped for the desk at the peak.
+      const flash = document.createElement('div');
+      flash.className = 'intro-flash';
+      document.body.appendChild(flash);
+      const [peak, ...decay] = STRIKE;
+      await gsap.fromTo(flash, { opacity: 0 }, peak).then();
+      intro.remove();
+      onStrike();
+      const tl = gsap.timeline();
+      for (const step of decay) tl.to(flash, step);
+      await tl.then();
+      flash.remove();
       resolve();
     }
 
